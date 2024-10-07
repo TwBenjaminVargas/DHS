@@ -30,6 +30,7 @@ NUMERO : DIGITO+ ;
 INT:'int';
 FOR: 'for';
 IF: 'if';
+ELSE: 'else';
 
 //saltarse todo tipo de espacio
 WS : [ \t\n\r] -> skip;
@@ -132,9 +133,13 @@ iter  : ID INC
       |
       ;
 
-iif:  PA cond PC instruccion;
+iif : IF PA cond PC instruccion
+    | IF PA cond PC instruccion ielse;
+
+ielse : ELSE instruccion;
 //preguntas:
 //- Se puede declarar en el for?
+//  -NO ES NECESARIO
 //mejoras:
 //-Incrementos añadidos a las operaciones aritmeticas
 //menor o igual en logicas

@@ -26,7 +26,7 @@
             // Archivo a parsear
             "input": "input/entrada.txt",
             // Simbolo inicial
-            "startRule": "ifor",
+            "startRule": "programa",
             // Muestra Arbol Sintactico
             "printParseTree": true,
             "visualParseTree": true
