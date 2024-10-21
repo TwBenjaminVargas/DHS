@@ -1,0 +1,8 @@
+while(a)
+{
+    int x;
+    x = 2;
+}
+{
+    int x;
+}
