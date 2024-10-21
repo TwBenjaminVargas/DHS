@@ -22,9 +22,12 @@ DEC: '--';
 AND: '&&';
 OR: '||';
 IGUAL: '==';
-
+NOT: '!=';
 ASIG : '=';
-
+MENOR : '<';
+MAYOR : '>';
+MEI : '<=';
+MAI : '>=';
 WHILE :'while';
 NUMERO : DIGITO+ ;
 INT:'int';
@@ -72,46 +75,39 @@ declaracion: INT ID;
 
 asignacion: ID ASIG opal;
 
-//operaciones aritmeticas y logicas
-opal: exp
-    | logic
-    ; //completar considerar orden de prioridades
+opal : expr;
 
-// se realizan las siguiente reglas para cumplir con el orden de prioridades
-logic : log  l;
-l : OR  log  l
-  |
-  ;
+// Reglas principales para manejar expresiones lógicas, relacionales y aritméticas
+expr: logic;
 
+// Lógica y operaciones relacionales
+logic : relation l;
+l : OR relation l
+  | ; // operadores lógicos 'OR'
+
+relation: exp r;
+r : (MENOR | MAYOR | MEI | MAI | IGUAL | NOT) exp r
+  | ; // operadores relacionales
+
+// Operaciones lógicas 'AND'
 log: exp lo;
 lo: AND exp lo
-  |
-  ;
+   | ;
 
-
-//expresion es la parte arimetica de las operaciones aritmeticas y logicas
+// Expresiones aritméticas
 exp: term e;
+e : (SUMA | RESTA) term e
+   | ;
 
-e : SUMA  term e
-  | RESTA term e
-  |
-  ;
+term: factor t;
+t : (MUL | DIV | MOD) factor t
+   | ;
 
+factor: NUMERO
+      | ID
+      | PA expr PC // Paréntesis para agrupar expresiones
+      ;
 
-term  : factor  t;
-
-t : MUL factor  t
-  | DIV factor  t
-  | MOD factor  t
-  | 
-  ;
-
-
-
-factor  : NUMERO
-        | ID
-        | PA exp PC
-        ;
 
 iwhile : WHILE PA ID PC instruccion ;
 

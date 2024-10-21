@@ -62,6 +62,15 @@ class compiladoresListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by compiladoresParser#expr.
+    def enterExpr(self, ctx:compiladoresParser.ExprContext):
+        pass
+
+    # Exit a parse tree produced by compiladoresParser#expr.
+    def exitExpr(self, ctx:compiladoresParser.ExprContext):
+        pass
+
+
     # Enter a parse tree produced by compiladoresParser#logic.
     def enterLogic(self, ctx:compiladoresParser.LogicContext):
         pass
@@ -77,6 +86,24 @@ class compiladoresListener(ParseTreeListener):
 
     # Exit a parse tree produced by compiladoresParser#l.
     def exitL(self, ctx:compiladoresParser.LContext):
+        pass
+
+
+    # Enter a parse tree produced by compiladoresParser#relation.
+    def enterRelation(self, ctx:compiladoresParser.RelationContext):
+        pass
+
+    # Exit a parse tree produced by compiladoresParser#relation.
+    def exitRelation(self, ctx:compiladoresParser.RelationContext):
+        pass
+
+
+    # Enter a parse tree produced by compiladoresParser#r.
+    def enterR(self, ctx:compiladoresParser.RContext):
+        pass
+
+    # Exit a parse tree produced by compiladoresParser#r.
+    def exitR(self, ctx:compiladoresParser.RContext):
         pass
 
 

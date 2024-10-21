@@ -39,6 +39,11 @@ class compiladoresVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by compiladoresParser#expr.
+    def visitExpr(self, ctx:compiladoresParser.ExprContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by compiladoresParser#logic.
     def visitLogic(self, ctx:compiladoresParser.LogicContext):
         return self.visitChildren(ctx)
@@ -46,6 +51,16 @@ class compiladoresVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by compiladoresParser#l.
     def visitL(self, ctx:compiladoresParser.LContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#relation.
+    def visitRelation(self, ctx:compiladoresParser.RelationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#r.
+    def visitR(self, ctx:compiladoresParser.RContext):
         return self.visitChildren(ctx)
 
 
