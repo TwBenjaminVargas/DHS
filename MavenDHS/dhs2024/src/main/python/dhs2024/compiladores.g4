@@ -12,7 +12,7 @@ PYC: ';';
 //Operadores matematicos
 SUMA: '+';
 RESTA: '-';
-MUL: '*';
+MULT: '*';
 DIV: '/';
 MOD: '%';
 INC:'++';
@@ -75,38 +75,71 @@ declaracion: INT ID;
 
 asignacion: ID ASIG opal;
 
-opal : expr;
+opal : exp ; //completar
 
-// Reglas principales para manejar expresiones lógicas, relacionales y aritméticas
-expr: logic;
+//exp : lor a ;
+exp : lor ;
 
-// Lógica y operaciones relacionales
-logic : relation l;
-l : OR relation l
-  | ; // operadores lógicos 'OR'
+lor: land a ;
+a : OR lor a
+  |
+  ;
 
-relation: exp r;
-r : (MENOR | MAYOR | MEI | MAI | IGUAL | NOT) exp r
-  | ; // operadores relacionales
+land : inot l ;
+l : AND land l
+  |
+  ;
 
-// Operaciones lógicas 'AND'
-log: exp lo;
-lo: AND exp lo
-   | ;
+inot : comp n ;
+n : NOT inot n
+  | IGUAL inot n
+  |
+  ;
 
-// Expresiones aritméticas
-exp: term e;
-e : (SUMA | RESTA) term e
-   | ;
+comp : op c ;
+/*c : MAYOR comp c
+  | MENOR comp c
+  | MAI comp c
+  | MEI comp c
+  |
+  ;*/
+c : (MAYOR | MENOR | MAI | MEI) comp  // Comparadores
+  |                                   // Regla vacía permitiendo finalizar sin comparador
+  ;
 
-term: factor t;
-t : (MUL | DIV | MOD) factor t
-   | ;
+op : term e ;
+/*e : SUMA op e
+  | RESTA op e
+//  | op e
+  |
+  ; */
+e : (SUMA | RESTA) op 
+  |                  // Regla vacía permitiendo finalizar sin SUMA o RESTA
+  ;
 
-factor: NUMERO
-      | ID
-      | PA expr PC // Paréntesis para agrupar expresiones
-      ;
+term : factor t ;
+/*t : MULT factor t 
+  | DIV factor t
+  | MOD factor t
+  |
+  ;*/
+t : (MULT | DIV | MOD) factor 
+  |                       // Regla vacía permitiendo finalizar sin operador
+  ;
+
+
+factor : NUMERO 
+       | ID
+       | PA exp PC
+       | suf
+       | pref
+       ;
+
+
+suf : ID (INC | DEC);
+
+pref : (INC | DEC)  ID;
+
 
 
 iwhile : WHILE PA ID PC instruccion ;
@@ -120,13 +153,13 @@ ifor  : FOR PA  init  PYC cond PYC iter PC  instruccion;
 init  : asignacion
       |
       ;
-cond : logic
+cond : opal
      |
      ;
-iter  : ID INC
-      | ID DEC
+iter  : 
       | asignacion
-      |
+      | suf
+      | pref
       ;
 
 iif : IF PA cond PC instruccion
