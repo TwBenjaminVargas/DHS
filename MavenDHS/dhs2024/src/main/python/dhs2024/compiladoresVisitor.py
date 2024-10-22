@@ -39,13 +39,23 @@ class compiladoresVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by compiladoresParser#expr.
-    def visitExpr(self, ctx:compiladoresParser.ExprContext):
+    # Visit a parse tree produced by compiladoresParser#exp.
+    def visitExp(self, ctx:compiladoresParser.ExpContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by compiladoresParser#logic.
-    def visitLogic(self, ctx:compiladoresParser.LogicContext):
+    # Visit a parse tree produced by compiladoresParser#lor.
+    def visitLor(self, ctx:compiladoresParser.LorContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#a.
+    def visitA(self, ctx:compiladoresParser.AContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#land.
+    def visitLand(self, ctx:compiladoresParser.LandContext):
         return self.visitChildren(ctx)
 
 
@@ -54,28 +64,28 @@ class compiladoresVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by compiladoresParser#relation.
-    def visitRelation(self, ctx:compiladoresParser.RelationContext):
+    # Visit a parse tree produced by compiladoresParser#inot.
+    def visitInot(self, ctx:compiladoresParser.InotContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by compiladoresParser#r.
-    def visitR(self, ctx:compiladoresParser.RContext):
+    # Visit a parse tree produced by compiladoresParser#n.
+    def visitN(self, ctx:compiladoresParser.NContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by compiladoresParser#log.
-    def visitLog(self, ctx:compiladoresParser.LogContext):
+    # Visit a parse tree produced by compiladoresParser#comp.
+    def visitComp(self, ctx:compiladoresParser.CompContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by compiladoresParser#lo.
-    def visitLo(self, ctx:compiladoresParser.LoContext):
+    # Visit a parse tree produced by compiladoresParser#c.
+    def visitC(self, ctx:compiladoresParser.CContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by compiladoresParser#exp.
-    def visitExp(self, ctx:compiladoresParser.ExpContext):
+    # Visit a parse tree produced by compiladoresParser#op.
+    def visitOp(self, ctx:compiladoresParser.OpContext):
         return self.visitChildren(ctx)
 
 
@@ -96,6 +106,16 @@ class compiladoresVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by compiladoresParser#factor.
     def visitFactor(self, ctx:compiladoresParser.FactorContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#suf.
+    def visitSuf(self, ctx:compiladoresParser.SufContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#pref.
+    def visitPref(self, ctx:compiladoresParser.PrefContext):
         return self.visitChildren(ctx)
 
 

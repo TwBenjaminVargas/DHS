@@ -79,7 +79,7 @@ class compiladoresLexer(Lexer):
     PYC = 5
     SUMA = 6
     RESTA = 7
-    MUL = 8
+    MULT = 8
     DIV = 9
     MOD = 10
     INC = 11
@@ -113,13 +113,13 @@ class compiladoresLexer(Lexer):
             "'else'" ]
 
     symbolicNames = [ "<INVALID>",
-            "PA", "PC", "LLA", "LLC", "PYC", "SUMA", "RESTA", "MUL", "DIV", 
+            "PA", "PC", "LLA", "LLC", "PYC", "SUMA", "RESTA", "MULT", "DIV", 
             "MOD", "INC", "DEC", "AND", "OR", "IGUAL", "NOT", "ASIG", "MENOR", 
             "MAYOR", "MEI", "MAI", "WHILE", "NUMERO", "INT", "FOR", "IF", 
             "ELSE", "WS", "ID" ]
 
     ruleNames = [ "LETRA", "DIGITO", "PA", "PC", "LLA", "LLC", "PYC", "SUMA", 
-                  "RESTA", "MUL", "DIV", "MOD", "INC", "DEC", "AND", "OR", 
+                  "RESTA", "MULT", "DIV", "MOD", "INC", "DEC", "AND", "OR", 
                   "IGUAL", "NOT", "ASIG", "MENOR", "MAYOR", "MEI", "MAI", 
                   "WHILE", "NUMERO", "INT", "FOR", "IF", "ELSE", "WS", "ID" ]
 
