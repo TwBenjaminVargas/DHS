@@ -1,2 +1,8 @@
-a = b-- && ++c
-i = (a + b) > c++ || --d * e <= f && g == h
+int x;
+int y;
+
+while(a)
+{
+    int x;
+    a = 1;
+}

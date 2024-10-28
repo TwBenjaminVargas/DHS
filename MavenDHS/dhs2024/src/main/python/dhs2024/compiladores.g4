@@ -9,6 +9,7 @@ PC: ')';
 LLA: '{';
 LLC: '}';
 PYC: ';';
+C: ',';
 //Operadores matematicos
 SUMA: '+';
 RESTA: '-';
@@ -30,10 +31,15 @@ MEI : '<=';
 MAI : '>=';
 WHILE :'while';
 NUMERO : DIGITO+ ;
-INT:'int';
 FOR: 'for';
 IF: 'if';
 ELSE: 'else';
+
+//tipo de dato
+INT:'int';
+FLOAT: 'float';
+CHAR: 'char';
+VOID: 'void';
 
 //saltarse todo tipo de espacio
 WS : [ \t\n\r] -> skip;
@@ -71,7 +77,7 @@ instruccion: declaracion PYC
             | asignacion PYC
             ;
 
-declaracion: INT ID;
+declaracion: (INT | FLOAT | CHAR | VOID) ID;
 
 asignacion: ID ASIG opal;
 
@@ -142,7 +148,7 @@ pref : (INC | DEC)  ID;
 
 
 
-iwhile : WHILE PA ID PC instruccion ;
+iwhile : WHILE PA cond PC instruccion ;
 
 bloque : LLA instrucciones LLC; 
 
@@ -166,6 +172,15 @@ iif : IF PA cond PC instruccion
     | IF PA cond PC instruccion ielse;
 
 ielse : ELSE instruccion;
+
+ifuncion  : tipo ID PA param PC instruccion;
+
+tipo  : (INT | VOID | FLOAT | CHAR);
+
+param : declaracion C param
+      | declaracion
+      |
+      ;
 //preguntas:
 //- Se puede declarar en el for?
 //  -NO ES NECESARIO

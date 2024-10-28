@@ -19,19 +19,19 @@ class TablaSimbolos:
     # retorna True si lo logra
     # de lo contrario retorna False    
     def addIdentificador(self,id):
-        return self.contextos[-1].addIdentificador(id)
+        self.contextos[-1].addIdentificador(id)
     
     # Busca identificador en el contexto actual y retorna si lo encuentra      
     def buscarLocal(self,strid):
         if strid in self.contextos[-1].tabla:
-            return self.contextos[-1].tabla[strid]
+            return True
         else:
-            return None
+            return False
         
     def buscarGlobal(self, strid):
         for contexto in reversed(self.contextos):
             if strid in contexto.tabla:
-                return contexto.tabla[strid]
-        return None
+                return True
+        return False
     
         

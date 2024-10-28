@@ -6,4 +6,10 @@ class Funcion(ID):
         self.inicializado = inicializado
         self.usado = usado
         self.args = argumentos
+    def __str__(self):
+        cad = """Funcion:{} Tipo:{}""".format(self.nombre,
+                                        self.tipoDato)
+        for arg in self.args:
+            cad = cad + "Argumento: " + arg.nombre
+        return cad
         

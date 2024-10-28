@@ -159,5 +159,20 @@ class compiladoresVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by compiladoresParser#ifuncion.
+    def visitIfuncion(self, ctx:compiladoresParser.IfuncionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#tipo.
+    def visitTipo(self, ctx:compiladoresParser.TipoContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#param.
+    def visitParam(self, ctx:compiladoresParser.ParamContext):
+        return self.visitChildren(ctx)
+
+
 
 del compiladoresParser
