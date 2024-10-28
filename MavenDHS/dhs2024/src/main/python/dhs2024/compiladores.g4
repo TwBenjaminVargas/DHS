@@ -77,7 +77,10 @@ instruccion: declaracion PYC
             | asignacion PYC
             ;
 
-declaracion: (INT | FLOAT | CHAR | VOID) ID;
+
+declaracion: tipo ID;
+
+tipo  : (INT | VOID | FLOAT | CHAR);
 
 asignacion: ID ASIG opal;
 
@@ -175,7 +178,6 @@ ielse : ELSE instruccion;
 
 ifuncion  : tipo ID PA param PC instruccion;
 
-tipo  : (INT | VOID | FLOAT | CHAR);
 
 param : declaracion C param
       | declaracion

@@ -48,17 +48,19 @@ class Escucha (compiladoresListener):
         #hijo [0 en adelante], elijo el 1
         #print("\tNombre de la variable: " + ctx.getChild(1).getText())
         
-        vartype = ctx.getChild(0).getText().upper()
-        name = ctx.getChild(1).getText()
+        # instanciamos objeto variable
+        vartype = ctx.getChild(0).getChild(0).getText().upper()
+        varname = ctx.getChild(1).getText()
         
-        # Creacion de variable
-        variable = Variable(name,vartype,False,False)
-        if not self.tabla.buscarGlobal(variable.nombre):
-            self.tabla.addIdentificador(variable)
+        myvar = Variable(vartype,varname)
+        
+        # verificar existencia en contexto
+        if not self.tabla.buscarLocal(myvar.nombre):
+            self.tabla.addIdentificador(myvar)
+            print(myvar)
         else:
-            print("\n-ERROR:\n\tidentificador repetido")
-        
-        print(variable)
+            print(f"-ERROR:\n\tIdentificado repetido {myvar.nombre}")
+            
 
     # Enter a parse tree produced by compiladoresParser#asignacion.
     def enterAsignacion(self, ctx:compiladoresParser.AsignacionContext):
@@ -66,8 +68,15 @@ class Escucha (compiladoresListener):
 
     # Exit a parse tree produced by compiladoresParser#asignacion.
     def exitAsignacion(self, ctx:compiladoresParser.AsignacionContext):
-        if not self.tabla.buscarGlobal(ctx.getChild(0).getText()):
+        
+        # buscar variable y la establece inicializada
+        myvar = self.tabla.buscarGlobal(ctx.getChild(0).getText())
+        if myvar:
+            myvar.inicializado = True
+            print(myvar)
+        else:    
             print("\n-ERROR:\n\tidentificador no declarado")
+            
     
 
         

@@ -1,0 +1,15 @@
+int x;
+int y;
+y = 1; // inicializada !usada
+{
+    int x;
+
+    {
+        int x;
+        {
+            int x;
+            y = 2;
+        
+        }
+    }
+}

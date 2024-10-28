@@ -4,5 +4,5 @@ int y;
 while(a)
 {
     int x;
-    a = 1;
+    y = 2;
 }
