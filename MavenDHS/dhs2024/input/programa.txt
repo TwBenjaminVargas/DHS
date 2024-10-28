@@ -1,8 +1,8 @@
+int x;
+int y;
+
 while(a)
 {
     int x;
-    x = 2;
-}
-{
-    int x;
+    a = 1;
 }

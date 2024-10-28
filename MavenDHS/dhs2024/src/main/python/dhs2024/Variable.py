@@ -9,5 +9,4 @@ class Variable(ID):
         self.usado = usado
         
     def __str__(self):
-            return"""Nombre:{} Tipo:{}""".format(self.nombre,
-                                        self.tipoDato)
+            return"""\tNombre:{}\n\tTipo:{}""".format(self.nombre,self.tipoDato)
