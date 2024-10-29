@@ -75,6 +75,7 @@ instruccion: declaracion PYC
             | ifor
             | iif
             | asignacion PYC
+            | ifuncion
             ;
 
 
