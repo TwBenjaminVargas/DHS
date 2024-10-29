@@ -131,7 +131,69 @@ class Escucha (compiladoresListener):
         
         self.exitContext()
     
-    
+
+    # Enter a parse tree produced by compiladoresParser#ifor.
+    def enterIfor(self, ctx:compiladoresParser.IforContext):
+        print("\n" + "="*20 + " For " + "="*20)
+        
+        # Iniciamos contexto for
+        self.tabla.addContexto()
+
+    # Exit a parse tree produced by compiladoresParser#ifor.
+    def exitIfor(self, ctx:compiladoresParser.IforContext):
+        print("\n"+ "="*20 + " Fin For "+ "="*20)
+        #print("\tCantidad de hijos: " + str(ctx.getChildCount()))
+        #print("\tTokens: " +ctx.getText())
+        
+        self.exitContext()
+
+    # Enter a parse tree produced by compiladoresParser#iif.
+    def enterIif(self, ctx:compiladoresParser.IifContext):
+        print("\n" + "="*20 + " If " + "="*20)
+        
+        # Iniciamos contexto if
+        self.tabla.addContexto()
+
+    # Exit a parse tree produced by compiladoresParser#iif.
+    def exitIif(self, ctx:compiladoresParser.IifContext):
+        print("\n"+ "="*20 + " Fin If "+ "="*20)
+        #print("\tCantidad de hijos: " + str(ctx.getChildCount()))
+        #print("\tTokens: " +ctx.getText())
+        
+        self.exitContext()
+
+
+    # Enter a parse tree produced by compiladoresParser#ielse.
+    def enterIelse(self, ctx:compiladoresParser.IelseContext):
+        print("\n" + "="*20 + " Else " + "="*20)
+        
+        # Iniciamos contexto else
+        self.tabla.addContexto()
+
+    # Exit a parse tree produced by compiladoresParser#ielse.
+    def exitIelse(self, ctx:compiladoresParser.IelseContext):
+        print("\n"+ "="*20 + " Fin Else "+ "="*20)
+        #print("\tCantidad de hijos: " + str(ctx.getChildCount()))
+        #print("\tTokens: " +ctx.getText())
+        
+        self.exitContext()
+
+
+    # Enter a parse tree produced by compiladoresParser#ifuncion.
+    def enterIfuncion(self, ctx:compiladoresParser.IfuncionContext):
+        print("\n" + "="*20 + " Funcion " + "="*20)
+        
+        # Iniciamos contexto funcion
+        self.tabla.addContexto()
+
+    # Exit a parse tree produced by compiladoresParser#ifuncion.
+    def exitIfuncion(self, ctx:compiladoresParser.IfuncionContext):
+        print("\n"+ "="*20 + " Fin Funcion "+ "="*20)
+        #print("\tCantidad de hijos: " + str(ctx.getChildCount()))
+        #print("\tTokens: " +ctx.getText())
+        
+        self.exitContext()
+
     def visitTerminal(self, node: TerminalNode):
         #print("-----> Token: " + node.getText())
         self.numTokens +=1
