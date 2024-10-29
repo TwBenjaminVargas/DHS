@@ -1,8 +1,8 @@
 int x;
 int y;
-
-while(a)
+y = 0;
+while(y)
 {
-    int x;
-    a = 1;
+    int j;
+    y = 2*3;
 }

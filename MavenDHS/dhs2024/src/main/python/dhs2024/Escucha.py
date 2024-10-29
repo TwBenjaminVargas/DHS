@@ -13,7 +13,13 @@ class Escucha (compiladoresListener):
         self.numNodos = 0
         self.tabla = TablaSimbolos()
         
-        
+    def exitContext(self):
+        for idstr in self.tabla.contextos[-1].tabla:
+           myvar = self.tabla.contextos[-1].tabla[idstr]
+           if not myvar.usado:
+               print("\nAdvertencia:\n\tVariable \"{}\" no utilizada".format(myvar.nombre))
+        self.tabla.delContexto()
+         
     # Enter a parse tree produced by compiladoresParser#programa.
     def enterPrograma(self, ctx:compiladoresParser.ProgramaContext):
         print("")
@@ -31,9 +37,7 @@ class Escucha (compiladoresListener):
         print("*" * 40)
         print("")
         
-        # Borrar contexto global
-        self.tabla.delContexto()
-        
+        self.exitContext() 
 
     
     # Enter a parse tree produced by compiladoresParser#declaracion.
@@ -76,8 +80,40 @@ class Escucha (compiladoresListener):
             print(myvar)
         else:    
             print("\n-ERROR:\n\tidentificador no declarado")
-            
     
+
+    def verificarID(self,id):
+        if id: # si encuentro un nodo ID
+            myvar = self.tabla.buscarGlobal(id.getText())
+            if myvar:
+                if myvar.inicializado:
+                    myvar.usado = True
+                    print(f"Uso:\n{myvar}")
+                else:
+                    print("\nError:\n\tVariable \"{}\" no inicializada".format(id.getText()))
+            else:
+                print("\nError:\n\tVariable \"{}\" no definida".format(id.getText()))
+    
+    # Exit a parse tree produced by compiladoresParser#factor.
+    def exitFactor(self, ctx:compiladoresParser.FactorContext):
+        id = ctx.getToken(compiladoresParser.ID, 0)
+        self.verificarID(id)
+        
+    # Exit a parse tree produced by compiladoresParser#suf.
+    def exitSuf(self, ctx:compiladoresParser.SufContext):
+        id = ctx.getToken(compiladoresParser.ID, 0)
+        self.verificarID(id)
+    
+    # Exit a parse tree produced by compiladoresParser#pref.
+    def exitPref(self, ctx:compiladoresParser.PrefContext):
+        id = ctx.getToken(compiladoresParser.ID, 0)
+        self.verificarID(id)
+        
+     
+        
+            
+                
+        
 
         
  #  Enter a parse tree produced by compiladoresParser#iwhile.
@@ -93,9 +129,9 @@ class Escucha (compiladoresListener):
         #print("\tCantidad de hijos: " + str(ctx.getChildCount()))
         #print("\tTokens: " +ctx.getText())
         
-        # Borramos contexto while
-        self.tabla.delContexto()
-        
+        self.exitContext()
+    
+    
     def visitTerminal(self, node: TerminalNode):
         #print("-----> Token: " + node.getText())
         self.numTokens +=1

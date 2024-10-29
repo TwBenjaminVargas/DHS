@@ -1,8 +1,18 @@
-int x;
-int y;
-
-while(a)
+int f(int, int);
+//comentarios deben ser ignorados
+void main(args,asumadre)
 {
-    int x;
-    y = 2;
+ int x;
+ int y;
+ int w;
+ x = 0;
+ y = 1;
+ w = f(x,y); 
+}
+
+int f(int x, int y)
+{
+    int z;
+    z = x + y;
+    return z;
 }

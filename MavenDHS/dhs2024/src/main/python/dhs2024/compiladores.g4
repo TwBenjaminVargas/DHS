@@ -147,24 +147,28 @@ factor : NUMERO
 
 suf : ID (INC | DEC);
 
-pref : (INC | DEC)  ID;
+pref  :  (INC | DEC)  ID;
 
 
 
-iwhile : WHILE PA cond PC instruccion ;
+iwhile  :  WHILE PA cond PC instruccion ;
 
-bloque : LLA instrucciones LLC; 
+cond  : opal
+      | factor;
+
+bloque  :  LLA instrucciones LLC; 
 
 
 // estructura for
-ifor  : FOR PA  init  PYC cond PYC iter PC  instruccion;
+ifor  : FOR PA  init  PYC condlist PYC iter PC  instruccion;
 
 init  : asignacion
       |
       ;
-cond : opal
-     |
-     ;
+
+condlist  : cond
+          |
+          ;
 iter  : 
       | asignacion
       | suf
@@ -183,6 +187,7 @@ param : declaracion C param
       | declaracion
       |
       ;
+
 //preguntas:
 //- Se puede declarar en el for?
 //  -NO ES NECESARIO
