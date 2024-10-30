@@ -296,6 +296,24 @@ class compiladoresListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by compiladoresParser#iprototipo.
+    def enterIprototipo(self, ctx:compiladoresParser.IprototipoContext):
+        pass
+
+    # Exit a parse tree produced by compiladoresParser#iprototipo.
+    def exitIprototipo(self, ctx:compiladoresParser.IprototipoContext):
+        pass
+
+
+    # Enter a parse tree produced by compiladoresParser#protoparam.
+    def enterProtoparam(self, ctx:compiladoresParser.ProtoparamContext):
+        pass
+
+    # Exit a parse tree produced by compiladoresParser#protoparam.
+    def exitProtoparam(self, ctx:compiladoresParser.ProtoparamContext):
+        pass
+
+
     # Enter a parse tree produced by compiladoresParser#ifuncion.
     def enterIfuncion(self, ctx:compiladoresParser.IfuncionContext):
         pass
@@ -311,6 +329,15 @@ class compiladoresListener(ParseTreeListener):
 
     # Exit a parse tree produced by compiladoresParser#param.
     def exitParam(self, ctx:compiladoresParser.ParamContext):
+        pass
+
+
+    # Enter a parse tree produced by compiladoresParser#ireturn.
+    def enterIreturn(self, ctx:compiladoresParser.IreturnContext):
+        pass
+
+    # Exit a parse tree produced by compiladoresParser#ireturn.
+    def exitIreturn(self, ctx:compiladoresParser.IreturnContext):
         pass
 
 

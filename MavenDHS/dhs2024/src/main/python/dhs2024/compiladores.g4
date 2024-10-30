@@ -10,6 +10,8 @@ LLA: '{';
 LLC: '}';
 PYC: ';';
 C: ',';
+PTO : '.';
+COMILLA : '\'';
 //Operadores matematicos
 SUMA: '+';
 RESTA: '-';
@@ -29,11 +31,14 @@ MENOR : '<';
 MAYOR : '>';
 MEI : '<=';
 MAI : '>=';
-WHILE :'while';
 NUMERO : DIGITO+ ;
+DECIMAL : NUMERO PTO NUMERO ;
+CARACTER : COMILLA (LETRA|DIGITO|) COMILLA ;
+WHILE :'while';
 FOR: 'for';
 IF: 'if';
 ELSE: 'else';
+RETURN : 'return';
 
 //tipo de dato
 INT:'int';
@@ -76,6 +81,7 @@ instruccion: declaracion PYC
             | iif
             | asignacion PYC
             | ifuncion
+            | ireturn
             ;
 
 
@@ -140,6 +146,8 @@ t : (MULT | DIV | MOD) factor
 
 factor : NUMERO 
        | ID
+       | DECIMAL
+       | CARACTER
        | PA exp PC
        | suf
        | pref
@@ -181,13 +189,21 @@ iif : IF PA cond PC instruccion
 
 ielse : ELSE instruccion;
 
-ifuncion  : tipo ID PA param PC instruccion;
+iprototipo : tipo ID PA protoparam PC PYC ;
 
+protoparam : tipo C param
+      | tipo
+      |
+      ;
+
+ifuncion  : tipo ID PA param PC instruccion;
 
 param : declaracion C param
       | declaracion
       |
       ;
+
+ireturn : RETURN opal PYC;
 
 //preguntas:
 //- Se puede declarar en el for?
