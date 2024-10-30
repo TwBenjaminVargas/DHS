@@ -169,6 +169,16 @@ class compiladoresVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by compiladoresParser#iprototipo.
+    def visitIprototipo(self, ctx:compiladoresParser.IprototipoContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#protoparam.
+    def visitProtoparam(self, ctx:compiladoresParser.ProtoparamContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by compiladoresParser#ifuncion.
     def visitIfuncion(self, ctx:compiladoresParser.IfuncionContext):
         return self.visitChildren(ctx)
@@ -176,6 +186,11 @@ class compiladoresVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by compiladoresParser#param.
     def visitParam(self, ctx:compiladoresParser.ParamContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#ireturn.
+    def visitIreturn(self, ctx:compiladoresParser.IreturnContext):
         return self.visitChildren(ctx)
 
 

@@ -1,6 +1,1 @@
-int x;
-int y;
-y = 0;
-void funcion (int x){
-    int c;
-}
+return x;
