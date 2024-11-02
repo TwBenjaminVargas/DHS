@@ -82,6 +82,7 @@ instruccion: declaracion PYC
             | asignacion PYC
             | ifuncion
             | ireturn
+            | illamada
             ;
 
 
@@ -189,12 +190,12 @@ iif : IF PA cond PC instruccion
 
 ielse : ELSE instruccion;
 
-iprototipo : tipo ID PA protoparam PC PYC ;
+//iprototipo : tipo ID PA protoparam PC PYC ;
 
-protoparam : tipo C param
-      | tipo
-      |
-      ;
+//protoparam : tipo C protoparam
+//      | tipo
+//      |
+//      ;
 
 ifuncion  : tipo ID PA param PC instruccion;
 
@@ -204,6 +205,13 @@ param : declaracion C param
       ;
 
 ireturn : RETURN opal PYC;
+
+illamada : ID PA argumento PC PYC;
+
+argumento : ID C argumento
+          | ID
+          |
+          ;
 
 //preguntas:
 //- Se puede declarar en el for?
