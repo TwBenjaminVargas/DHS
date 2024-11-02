@@ -14,13 +14,14 @@ class Escucha (compiladoresListener):
         self.tabla = TablaSimbolos()
         #pila de control de tipos
         self.controlTypeLists = list()
-        
+        self.currentParamLists = list()
+        self.inFuncion = False
         
     def exitContext(self):
         for idstr in self.tabla.contextos[-1].tabla:
-           myvar = self.tabla.contextos[-1].tabla[idstr]
-           if not myvar.usado:
-               print("\nAdvertencia:\n\n\tVariable \"{}\" no utilizada".format(myvar.nombre))
+            myvar = self.tabla.contextos[-1].tabla[idstr]
+            if not myvar.usado:
+                print("\nAdvertencia:\n\n\tVariable \"{}\" no utilizada".format(myvar.nombre))
         self.tabla.delContexto()
          
     # Enter a parse tree produced by compiladoresParser#programa.
@@ -67,6 +68,10 @@ class Escucha (compiladoresListener):
             print(myvar)
         else:
             print(f"-ERROR:\n\tIdentificado repetido {myvar.nombre}")
+        
+        if self.inFuncion :
+            self.currentParamLists.append(myvar)
+        
                 
     
     # Enter a parse tree produced by compiladoresParser#asignacion.
@@ -207,6 +212,7 @@ class Escucha (compiladoresListener):
         self.exitContext()
         print("\n"+ "="*20 + " Fin Else "+ "="*20)
 
+    #Manejo de funciones
 
     # Enter a parse tree produced by compiladoresParser#ifuncion.
     def enterIfuncion(self, ctx:compiladoresParser.IfuncionContext):
@@ -214,13 +220,34 @@ class Escucha (compiladoresListener):
         self.tabla.addContexto()
         print("\n" + "="*20 + " Funcion " + "="*20)
 
+
     # Exit a parse tree produced by compiladoresParser#ifuncion.
     def exitIfuncion(self, ctx:compiladoresParser.IfuncionContext):
         #print("\tCantidad de hijos: " + str(ctx.getChildCount()))
         #print("\tTokens: " +ctx.getText())
         self.exitContext()
+        tipoFuncion = ctx.getChild(0).getText()
+        idFuncion = ctx.getChild(1).getText()
+        myFuncion = Funcion(idFuncion,tipoFuncion,False,False,self.currentParamLists)
+        self.currentParamLists = []
+        # verificar existencia en contexto
+        if not self.tabla.buscarLocal(myFuncion.nombre):
+            self.tabla.addIdentificador(myFuncion)
+            print("\nDatos de funcion:")
+            print(myFuncion)
+        else:
+            print(f"-ERROR:\n\tIdentificado repetido {myFuncion.nombre}")
+        
         print("\n"+ "="*20 + " Fin Funcion "+ "="*20)
         
+    # Enter a parse tree produced by compiladoresParser#param.
+    def enterParam(self, ctx:compiladoresParser.ParamContext):
+        self.inFuncion = True
+
+    # Exit a parse tree produced by compiladoresParser#param.
+    def exitParam(self, ctx:compiladoresParser.ParamContext):
+        self.inFuncion = False
+
      # Enter a parse tree produced by compiladoresParser#cond.
     def enterCond(self, ctx:compiladoresParser.CondContext):
         self.controlTypeLists.append(list())
