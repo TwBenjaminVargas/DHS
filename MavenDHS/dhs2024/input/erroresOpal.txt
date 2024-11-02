@@ -1,0 +1,12 @@
+// no debe tomar
+
+char y;
+int x;
+x = 97;
+
+y = 'a';
+
+if(x == y)
+{
+
+}

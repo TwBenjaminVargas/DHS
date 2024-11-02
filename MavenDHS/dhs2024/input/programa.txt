@@ -6,3 +6,4 @@ while(y)
     int j;
     y = 2*3;
 }
+s

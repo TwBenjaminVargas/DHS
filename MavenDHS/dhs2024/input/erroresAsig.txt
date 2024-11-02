@@ -1,0 +1,18 @@
+int x;
+float y;
+char w;
+
+//no queremos
+x = 2.1;
+x = y;
+w = 2.1;
+w = y;
+
+
+
+//debe aceptar
+w = 97; 
+x = w; 
+x = 'b';
+y = 'a';
+y = x + 1.0; // o similares

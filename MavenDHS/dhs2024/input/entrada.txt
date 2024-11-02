@@ -1,1 +1,16 @@
-return x;
+void main()
+{
+    int x;
+    int y;
+    x = 2;
+    y = 3;
+    
+    if(x == y)
+    {
+      x = y + 1;  
+    }
+    else
+    {
+        y = x +1;
+    }
+}
