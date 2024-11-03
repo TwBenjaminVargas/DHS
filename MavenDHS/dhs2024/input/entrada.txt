@@ -1,4 +1,9 @@
-if(x == 0){
-  x = 1.6;
-  return x;
+float f()
+{
+  int x;
+  x = 0;
 }
+
+int x;
+
+x = f();

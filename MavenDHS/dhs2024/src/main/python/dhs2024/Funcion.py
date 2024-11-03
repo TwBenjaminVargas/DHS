@@ -10,6 +10,6 @@ class Funcion(ID):
         cad = """\tFuncion:{}\n\tTipo:{}""".format(self.nombre,
                                         self.tipoDato)
         for arg in self.args:
-            cad = cad + "\n\tArgumento: " + arg.nombre
+            cad = cad + "\n\tArgumento: " + arg.tipoDato
         return cad
         

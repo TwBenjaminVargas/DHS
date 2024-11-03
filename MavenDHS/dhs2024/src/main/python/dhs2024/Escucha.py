@@ -17,12 +17,14 @@ class Escucha (compiladoresListener):
         self.currentParamLists = list()
         self.inFuncion = False
         self.inParam = False
+        self.inAsignacion = False
+        self.itsReturns = False 
 
-    def exitContext(self):
+    def exitContext(self):        
         for idstr in self.tabla.contextos[-1].tabla:
             myvar = self.tabla.contextos[-1].tabla[idstr]
             if not myvar.usado:
-                print("\nAdvertencia:\n\n\tVariable \"{}\" no utilizada".format(myvar.nombre))
+                print("\nAdvertencia:\n\n\tIdentificador \"{}\" no utilizada".format(myvar.nombre))
         self.tabla.delContexto()
          
     # Enter a parse tree produced by compiladoresParser#programa.
@@ -78,7 +80,8 @@ class Escucha (compiladoresListener):
     # Enter a parse tree produced by compiladoresParser#asignacion.
     def enterAsignacion(self, ctx:compiladoresParser.AsignacionContext):
         print("\n+Asignacion")
-        self.controlTypeLists.append(list()) #agregamos una lista de control 
+        self.controlTypeLists.append(list()) #agregamos una lista de control
+        self.inAsignacion = True
     
     # Aqui se incluiran algunas reglas para validar una asignacion segun el tipo
     def validarAsignacion(self,tipodato):
@@ -110,6 +113,7 @@ class Escucha (compiladoresListener):
         else:    
             print("\n-ERROR:\n\tidentificador no declarado")
             
+        self.inAsignacion = False
         #eliminamos ultimo elemnto de pila de control
         print(f"\nTipos usados en esta asignacion: {self.controlTypeLists.pop()}")
     
@@ -118,12 +122,13 @@ class Escucha (compiladoresListener):
         myvar = self.tabla.buscarGlobal(id.getText())
         if myvar:
             if not myvar.inicializado:
-                print("\nError:\n\tVariable \"{}\" no inicializada".format(id.getText()))
+                print("\nError:\n\tIdentificador \"{}\" no inicializada".format(id.getText()))
             myvar.usado = True
             self.controlTypeLists[-1].append(myvar.tipoDato)
-        else:
-            print("\nError:\n\tVariable \"{}\" no definida".format(id.getText()))
             
+        else:
+            print("\nError:\n\tIdentificador \"{}\" no definido".format(id.getText()))
+            return None
     # Añade un tipo de dato a la lista de control
     def addControlTypeListElement(self,ctx:compiladoresParser.FactorContext):
         if ctx.getToken(compiladoresParser.NUMERO, 0):
@@ -237,7 +242,7 @@ class Escucha (compiladoresListener):
         self.exitContext()
         tipoFuncion = ctx.getChild(0).getText().upper()
         idFuncion = ctx.getChild(1).getText()
-        myFuncion = Funcion(idFuncion,tipoFuncion,False,False,self.currentParamLists)
+        myFuncion = Funcion(idFuncion,tipoFuncion,True,False,self.currentParamLists)
         self.currentParamLists = []
         # verificar existencia en contexto
         if not self.tabla.buscarLocal(myFuncion.nombre):
@@ -246,9 +251,15 @@ class Escucha (compiladoresListener):
             print(myFuncion)
         else:
             print(f"-Error:\n\tIdentificado repetido {myFuncion.nombre}")
+        
         #verificar compatibilidad con los datos retornados
-        self.validarAsignacion(tipoFuncion)
-        print(f"\nTipos de datos usados en return : {self.controlTypeLists.pop()}")
+        if not self.itsReturns and tipoFuncion != 'VOID':
+            print(f"-Error:\n\tSe espera un valor de retorno {tipoFuncion} y no se proporciono ningun retorno")
+        if self.itsReturns:
+            self.validarAsignacion(tipoFuncion)
+            print(f"\nTipos de datos usados en return : {self.controlTypeLists.pop()}")
+            self.itsReturns = False
+        
         self.inFuncion = False
         print("\n"+ "="*20 + " Fin Funcion "+ "="*20)
         
@@ -273,6 +284,7 @@ class Escucha (compiladoresListener):
         self.controlTypeLists.append(list())
         if not self.inFuncion :
             print("-Error:\n\tUtilizacion de un return sin funcion")
+        self.itsReturns = True
 
     # Enter a parse tree produced by compiladoresParser#illamada.
     def enterIllamada(self, ctx:compiladoresParser.IllamadaContext):
@@ -280,7 +292,40 @@ class Escucha (compiladoresListener):
 
     # Exit a parse tree produced by compiladoresParser#illamada.
     def exitIllamada(self, ctx:compiladoresParser.IllamadaContext):
-        pass
+        id = ctx.getChild(0)
+        myfunc = self.tabla.buscarGlobal(id.getText())
+        # buscar en la tabla el identificador en caso que no sea una asignacion
+        if myfunc :
+            print(myfunc)
+            if self.inAsignacion:
+                self.controlTypeLists[-1].append(myfunc.tipoDato) #lo añadimos a la lista de control de tipos
+            
+            myfunc.usado = True        
+            # verificamos argumentos
+            if len(myfunc.args) != len(self.currentParamLists):
+                print("\n-Error:\n\tCantidad de argumentos incompatibles")
+            else:
+                for i , arg in enumerate(myfunc.args):
+                    if arg.tipoDato != self.currentParamLists[i].tipoDato:
+                        print(f"\n-Error:\n\tTipo de argumento incompatible, se espera {arg.tipoDato} y se dio {self.currentParamLists[i].tipoDato}")
+    
+            self.currentParamLists = []
+        else: 
+            print(f"\n-Error:\n\tfuncion {id.getText()} no declarada")
+        
+        
+        
+    # Exit a parse tree produced by compiladoresParser#argumento.
+    def exitArgumento(self, ctx:compiladoresParser.ArgumentoContext):
+         id = ctx.getToken(compiladoresParser.ID, 0)
+         if id:
+            arg = self.tabla.buscarGlobal(id.getText())
+            if arg:
+                self.currentParamLists.append(arg)
+                arg.usado = True
+            else:
+                print(f"\n-Error:\n\tidentificador {id.getText()} no declarado")
+            
 
 
     def visitTerminal(self, node: TerminalNode):
