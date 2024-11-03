@@ -16,7 +16,8 @@ class Escucha (compiladoresListener):
         self.controlTypeLists = list()
         self.currentParamLists = list()
         self.inFuncion = False
-        
+        self.inParam = False
+
     def exitContext(self):
         for idstr in self.tabla.contextos[-1].tabla:
             myvar = self.tabla.contextos[-1].tabla[idstr]
@@ -69,7 +70,7 @@ class Escucha (compiladoresListener):
         else:
             print(f"-ERROR:\n\tIdentificado repetido {myvar.nombre}")
         
-        if self.inFuncion :
+        if self.inParam :
             self.currentParamLists.append(myvar)
         
                 
@@ -81,12 +82,20 @@ class Escucha (compiladoresListener):
     
     # Aqui se incluiran algunas reglas para validar una asignacion segun el tipo
     def validarAsignacion(self,tipodato):
-        if tipodato == 'INT':
-            if 'FLOAT' in self.controlTypeLists[-1]:
-                print("\nError:\n\tIntento de asignacion de FLOAT a INT")
-        if tipodato == 'CHAR':
-            if 'FLOAT' in self.controlTypeLists[-1]:
-                print("\nError:\n\tIntento de asignacion de FLOAT a CHAR")
+        if self.inFuncion :
+            if tipodato == 'INT':
+                if 'FLOAT' in self.controlTypeLists[-1]:
+                    print("\nError:\n\tIntento de retorno de FLOAT, esperado INT")
+            if tipodato == 'CHAR':
+                if 'FLOAT' in self.controlTypeLists[-1]:
+                    print("\nError:\n\tIntento de retorno de FLOAT, esperado CHAR")
+        else:    
+            if tipodato == 'INT':
+                if 'FLOAT' in self.controlTypeLists[-1]:
+                    print("\nError:\n\tIntento de asignacion de FLOAT a INT")
+            if tipodato == 'CHAR':
+                if 'FLOAT' in self.controlTypeLists[-1]:
+                    print("\nError:\n\tIntento de asignacion de FLOAT a CHAR")
       
     # Exit a parse tree produced by compiladoresParser#asignacion.
     def exitAsignacion(self, ctx:compiladoresParser.AsignacionContext):
@@ -101,10 +110,8 @@ class Escucha (compiladoresListener):
         else:    
             print("\n-ERROR:\n\tidentificador no declarado")
             
-            
         #eliminamos ultimo elemnto de pila de control
         print(f"\nTipos usados en esta asignacion: {self.controlTypeLists.pop()}")
-        self.isInAsignacion = False
     
     #Verifica si un ID existe o esta inicializado y lo añade a la controlList
     def verificarID(self,id):
@@ -212,12 +219,14 @@ class Escucha (compiladoresListener):
         self.exitContext()
         print("\n"+ "="*20 + " Fin Else "+ "="*20)
 
+
     #Manejo de funciones
 
     # Enter a parse tree produced by compiladoresParser#ifuncion.
     def enterIfuncion(self, ctx:compiladoresParser.IfuncionContext):
         # Iniciamos contexto funcion
         self.tabla.addContexto()
+        self.inFuncion = True
         print("\n" + "="*20 + " Funcion " + "="*20)
 
 
@@ -226,7 +235,7 @@ class Escucha (compiladoresListener):
         #print("\tCantidad de hijos: " + str(ctx.getChildCount()))
         #print("\tTokens: " +ctx.getText())
         self.exitContext()
-        tipoFuncion = ctx.getChild(0).getText()
+        tipoFuncion = ctx.getChild(0).getText().upper()
         idFuncion = ctx.getChild(1).getText()
         myFuncion = Funcion(idFuncion,tipoFuncion,False,False,self.currentParamLists)
         self.currentParamLists = []
@@ -236,17 +245,20 @@ class Escucha (compiladoresListener):
             print("\nDatos de funcion:")
             print(myFuncion)
         else:
-            print(f"-ERROR:\n\tIdentificado repetido {myFuncion.nombre}")
-        
+            print(f"-Error:\n\tIdentificado repetido {myFuncion.nombre}")
+        #verificar compatibilidad con los datos retornados
+        self.validarAsignacion(tipoFuncion)
+        print(f"\nTipos de datos usados en return : {self.controlTypeLists.pop()}")
+        self.inFuncion = False
         print("\n"+ "="*20 + " Fin Funcion "+ "="*20)
         
     # Enter a parse tree produced by compiladoresParser#param.
     def enterParam(self, ctx:compiladoresParser.ParamContext):
-        self.inFuncion = True
+        self.inParam = True
 
     # Exit a parse tree produced by compiladoresParser#param.
     def exitParam(self, ctx:compiladoresParser.ParamContext):
-        self.inFuncion = False
+        self.inParam = False
 
      # Enter a parse tree produced by compiladoresParser#cond.
     def enterCond(self, ctx:compiladoresParser.CondContext):
@@ -255,6 +267,20 @@ class Escucha (compiladoresListener):
     # Exit a parse tree produced by compiladoresParser#cond.
     def exitCond(self, ctx:compiladoresParser.CondContext):
         print(f"Tipos de datos usados en condicion : {self.controlTypeLists.pop()}")
+
+    # Enter a parse tree produced by compiladoresParser#ireturn.
+    def enterIreturn(self, ctx:compiladoresParser.IreturnContext):
+        self.controlTypeLists.append(list())
+        if not self.inFuncion :
+            print("-Error:\n\tUtilizacion de un return sin funcion")
+
+    # Enter a parse tree produced by compiladoresParser#illamada.
+    def enterIllamada(self, ctx:compiladoresParser.IllamadaContext):
+        print("\n+Llamada a funcion:\n")
+
+    # Exit a parse tree produced by compiladoresParser#illamada.
+    def exitIllamada(self, ctx:compiladoresParser.IllamadaContext):
+        pass
 
 
     def visitTerminal(self, node: TerminalNode):
