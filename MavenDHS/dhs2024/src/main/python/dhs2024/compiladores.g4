@@ -90,7 +90,9 @@ declaracion: tipo ID;
 
 tipo  : (INT | VOID | FLOAT | CHAR);
 
-asignacion: ID ASIG opal;
+asignacion: ID ASIG opal
+          | ID ASIG illamada
+          ;
 
 opal : exp ; //completar
 
@@ -213,9 +215,3 @@ argumento : ID C argumento
           |
           ;
 
-//preguntas:
-//- Se puede declarar en el for?
-//  -NO ES NECESARIO
-//mejoras:
-//-Incrementos añadidos a las operaciones aritmeticas
-//menor o igual en logicas
