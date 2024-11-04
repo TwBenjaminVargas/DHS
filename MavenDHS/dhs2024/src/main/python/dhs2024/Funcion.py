@@ -7,7 +7,7 @@ class Funcion(ID):
         self.usado = usado
         self.args = argumentos
     def __str__(self):
-        cad = """\tFuncion:{}\n\tTipo:{}""".format(self.nombre,
+        cad = """\n\tFuncion:{}\n\tTipo:{}""".format(self.nombre,
                                         self.tipoDato)
         for arg in self.args:
             cad = cad + "\n\tArgumento: " + arg.tipoDato

@@ -8,3 +8,9 @@ class Contexto:
     # de lo contrario retorna False
     def addIdentificador(self,id :ID):
         self.tabla[id.nombre] = id
+    
+    def __str__(self):
+        str = ""
+        for strid in self.tabla:
+            str=str + "\n" + self.tabla[strid].__str__()
+        return str

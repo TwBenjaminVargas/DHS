@@ -58,6 +58,13 @@ class Escucha (compiladoresListener):
         print("=" * TAM)
         print("")
         
+        print("TABLA CONTEXTOS:")
+        for i, contexto in enumerate(self.tabla.contextosHistoric):
+            print("."*TAM)
+            print(f"CONTEXTO {i}:" + contexto.__str__())
+        print("."*TAM)
+        print("")
+
 
     
     # Enter a parse tree produced by compiladoresParser#declaracion.

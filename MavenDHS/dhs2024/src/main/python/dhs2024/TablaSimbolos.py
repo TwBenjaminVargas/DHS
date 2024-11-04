@@ -3,11 +3,13 @@ class TablaSimbolos:
     
     def __init__(self):
         self.contextos = []
+        self.contextosHistoric = []
     
     # Añade un contexto a la pila de contextos 
     def addContexto(self):
         contexto = Contexto()
         self.contextos.append(contexto)
+        self.contextosHistoric.append(contexto)
         return contexto
     
     # Elimina ultimo contexto añadido a la pila

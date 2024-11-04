@@ -8,4 +8,4 @@ class Variable(ID):
         self.inicializado = inicializado
         self.usado = usado
     def __str__(self):
-            return"\tNombre:{}\n\tTipo:{}\n\tInicializado:{}\n\tUsado:{}".format(self.nombre,self.tipoDato,self.inicializado,self.usado)
+            return"\n\tVariable:{}\n\tTipo:{}\n\tInicializado:{}\n\tUsado:{}".format(self.nombre,self.tipoDato,self.inicializado,self.usado)
