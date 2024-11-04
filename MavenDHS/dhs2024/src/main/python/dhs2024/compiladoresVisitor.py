@@ -1,4 +1,4 @@
-# Generated from /home/antobadami/Documentos/proyectodhs/DHS/MavenDHS/dhs2024/src/main/python/dhs2024/compiladores.g4 by ANTLR 4.13.1
+# Generated from /home/ben/Documentos/DHS/MavenDHS/dhs2024/src/main/python/dhs2024/compiladores.g4 by ANTLR 4.13.1
 from antlr4 import *
 if "." in __name__:
     from .compiladoresParser import compiladoresParser
@@ -169,16 +169,6 @@ class compiladoresVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by compiladoresParser#iprototipo.
-    def visitIprototipo(self, ctx:compiladoresParser.IprototipoContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by compiladoresParser#protoparam.
-    def visitProtoparam(self, ctx:compiladoresParser.ProtoparamContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by compiladoresParser#ifuncion.
     def visitIfuncion(self, ctx:compiladoresParser.IfuncionContext):
         return self.visitChildren(ctx)
@@ -191,6 +181,16 @@ class compiladoresVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by compiladoresParser#ireturn.
     def visitIreturn(self, ctx:compiladoresParser.IreturnContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#illamada.
+    def visitIllamada(self, ctx:compiladoresParser.IllamadaContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#argumento.
+    def visitArgumento(self, ctx:compiladoresParser.ArgumentoContext):
         return self.visitChildren(ctx)
 
 

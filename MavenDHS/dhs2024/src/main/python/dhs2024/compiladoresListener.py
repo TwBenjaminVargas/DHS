@@ -1,4 +1,4 @@
-# Generated from /home/antobadami/Documentos/proyectodhs/DHS/MavenDHS/dhs2024/src/main/python/dhs2024/compiladores.g4 by ANTLR 4.13.1
+# Generated from /home/ben/Documentos/DHS/MavenDHS/dhs2024/src/main/python/dhs2024/compiladores.g4 by ANTLR 4.13.1
 from antlr4 import *
 if "." in __name__:
     from .compiladoresParser import compiladoresParser
@@ -296,24 +296,6 @@ class compiladoresListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by compiladoresParser#iprototipo.
-    def enterIprototipo(self, ctx:compiladoresParser.IprototipoContext):
-        pass
-
-    # Exit a parse tree produced by compiladoresParser#iprototipo.
-    def exitIprototipo(self, ctx:compiladoresParser.IprototipoContext):
-        pass
-
-
-    # Enter a parse tree produced by compiladoresParser#protoparam.
-    def enterProtoparam(self, ctx:compiladoresParser.ProtoparamContext):
-        pass
-
-    # Exit a parse tree produced by compiladoresParser#protoparam.
-    def exitProtoparam(self, ctx:compiladoresParser.ProtoparamContext):
-        pass
-
-
     # Enter a parse tree produced by compiladoresParser#ifuncion.
     def enterIfuncion(self, ctx:compiladoresParser.IfuncionContext):
         pass
@@ -338,6 +320,24 @@ class compiladoresListener(ParseTreeListener):
 
     # Exit a parse tree produced by compiladoresParser#ireturn.
     def exitIreturn(self, ctx:compiladoresParser.IreturnContext):
+        pass
+
+
+    # Enter a parse tree produced by compiladoresParser#illamada.
+    def enterIllamada(self, ctx:compiladoresParser.IllamadaContext):
+        pass
+
+    # Exit a parse tree produced by compiladoresParser#illamada.
+    def exitIllamada(self, ctx:compiladoresParser.IllamadaContext):
+        pass
+
+
+    # Enter a parse tree produced by compiladoresParser#argumento.
+    def enterArgumento(self, ctx:compiladoresParser.ArgumentoContext):
+        pass
+
+    # Exit a parse tree produced by compiladoresParser#argumento.
+    def exitArgumento(self, ctx:compiladoresParser.ArgumentoContext):
         pass
 
 
