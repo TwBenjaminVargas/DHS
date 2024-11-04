@@ -82,7 +82,7 @@ instruccion: declaracion PYC
             | asignacion PYC
             | ifuncion
             | ireturn
-            | illamada
+            | illamada PYC
             ;
 
 
@@ -91,7 +91,7 @@ declaracion: tipo ID;
 tipo  : (INT | VOID | FLOAT | CHAR);
 
 asignacion: ID ASIG opal
-          | ID ASIG illamada
+          | ID ASIG illamada // para primeras versiones se usara asi
           ;
 
 opal : exp ; //completar
@@ -208,7 +208,7 @@ param : declaracion C param
 
 ireturn : RETURN opal PYC;
 
-illamada : ID PA argumento PC PYC;
+illamada : ID PA argumento PC;
 
 argumento : ID C argumento
           | ID
