@@ -1,3 +1,11 @@
+"""
+    Trabajo practico nro 1
+    - Badami Celeste Antonella
+    - Vargas Benjamin
+    
+    Nuestro repositorio: https://github.com/TwBenjaminVargas/DHS
+"""
+
 import sys
 from antlr4 import *
 from compiladoresLexer  import compiladoresLexer
