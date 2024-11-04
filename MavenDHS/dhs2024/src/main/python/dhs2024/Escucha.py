@@ -96,6 +96,7 @@ class Escucha (compiladoresListener):
     
         
         if self.inParam :
+            myvar.inicializado = True #suponemos inicializado un parametro
             self.currentParamLists.append(myvar)
         
                 
