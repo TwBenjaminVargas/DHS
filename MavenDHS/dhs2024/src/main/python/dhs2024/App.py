@@ -4,6 +4,7 @@
     - Vargas Benjamin
     
     Nuestro repositorio: https://github.com/TwBenjaminVargas/DHS
+    En la carpeta MavenDHS/dhs2024
 """
 
 import sys
