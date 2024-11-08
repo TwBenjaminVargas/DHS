@@ -14,15 +14,19 @@ class Escucha (compiladoresListener):
         self.numNodos = 0
         self.tabla = TablaSimbolos()
         
+        self.lastTypeUsed = None
+        
         #pila de control de tipos
         self.controlTypeLists = list()
         self.currentParamLists = list()
+        self.currentDeclarationList = list()
         
         #flags
         self.inFuncion = False
         self.inParam = False
         self.inAsignacion = False
         self.itsReturns = False 
+        self.inDeclaration = False
 
     def exitContext(self):
         """
@@ -70,7 +74,7 @@ class Escucha (compiladoresListener):
     # Enter a parse tree produced by compiladoresParser#declaracion.
     def enterDeclaracion(self, ctx:compiladoresParser.DeclaracionContext):
         #print("\n+Declaracion:\n")
-        pass
+        self.inDeclaration = True
         
         
         
@@ -78,28 +82,41 @@ class Escucha (compiladoresListener):
     def exitDeclaracion(self, ctx:compiladoresParser.DeclaracionContext):    
         
         # instanciamos objeto variable
+        
+        #obtenemos el tipo de dato
         vartype = ctx.getChild(0).getChild(0).getText().upper()
-        varname = ctx.getChild(1).getText()
-        
-        myvar = Variable(vartype,varname)
-        
-        # verificar existencia en contexto
-        if not self.tabla.buscarLocal(myvar.nombre):
-            self.tabla.addIdentificador(myvar)
-            #print(myvar)
-        else:
-            print("")
-            print("-"*TAM)
-            print("ERROR SEMANTICO:".center(TAM))
-            print(f"Nombre de identificado repetido \"{myvar.nombre}\"".center(TAM))
-            print("-"*TAM)
-    
-        
-        if self.inParam :
-            myvar.inicializado = True #suponemos inicializado un parametro
-            self.currentParamLists.append(myvar)
-        
+        self.lastTypeUsed = vartype
+        #añadimos la primera ID a la lista de declaraciones solo si es un id
+        id = ctx.getToken(compiladoresParser.ID, 0)
+        if id:
+            self.currentDeclarationList.append(Variable(0,ctx.getChild(1).getText()))
+        for myvar in self.currentDeclarationList:
+            myvar.tipoDato = vartype   
+            # verificar existencia en contexto
+            if not self.tabla.buscarLocal(myvar.nombre):
+                self.tabla.addIdentificador(myvar)
+                #print(myvar)
+            else:
+                print("")
+                print("-"*TAM)
+                print("ERROR SEMANTICO:".center(TAM))
+                print(f"Nombre de identificado repetido \"{myvar.nombre}\"".center(TAM))
+                print("-"*TAM)
                 
+            # REVISAR 
+            if self.inParam :
+                myvar.inicializado = True #suponemos inicializado un parametro
+                self.currentParamLists.append(myvar)
+        
+        self.inDeclaration = False
+        self.lastTypeUsed = None
+        self.currentDeclarationList = [] 
+    
+    # Exit a parse tree produced by compiladoresParser#dec.
+    def exitDec(self, ctx:compiladoresParser.DecContext):
+        id = ctx.getToken(compiladoresParser.ID, 0)
+        if id:
+            self.currentDeclarationList.append(Variable(0,id.getText()))
     
     # Enter a parse tree produced by compiladoresParser#asignacion.
     def enterAsignacion(self, ctx:compiladoresParser.AsignacionContext):
@@ -142,8 +159,13 @@ class Escucha (compiladoresListener):
       
     # Exit a parse tree produced by compiladoresParser#asignacion.
     def exitAsignacion(self, ctx:compiladoresParser.AsignacionContext):
-        # buscar variable
-        myvar = self.tabla.buscarGlobal(ctx.getChild(0).getText())
+        myvar = None
+        if self.inDeclaration:
+            self.currentDeclarationList.append(Variable(self.lastTypeUsed,ctx.getChild(0).getText()))
+            myvar = self.currentDeclarationList[-1]
+        else:
+            # buscar variable
+            myvar = self.tabla.buscarGlobal(ctx.getChild(0).getText())
         # valida asignacion y establece inicializada
         if myvar:
             self.validarAsignacion(myvar.tipoDato)
@@ -279,7 +301,6 @@ class Escucha (compiladoresListener):
         self.inFuncion = True
         #print("\n" + "="*20 + " Funcion " + "="*20)
 
-
     # Exit a parse tree produced by compiladoresParser#ifuncion.
     def exitIfuncion(self, ctx:compiladoresParser.IfuncionContext):
         
@@ -324,7 +345,25 @@ class Escucha (compiladoresListener):
     # Exit a parse tree produced by compiladoresParser#param.
     def exitParam(self, ctx:compiladoresParser.ParamContext):
         self.inParam = False
+ 
+ # Exit a parse tree produced by compiladoresParser#p.
+    def exitP(self, ctx:compiladoresParser.PContext):
+        varname = ctx.getChild(1).getText()
+        vartype = ctx.getChild(0).getText().upper()
+        myvar = Variable (vartype,varname,True,False)
+        self.currentParamLists.append(myvar)
+        # verificar existencia en contexto
+        if not self.tabla.buscarLocal(myvar.nombre):
+            self.tabla.addIdentificador(myvar)
+        else:
+            print("")
+            print("-"*TAM)
+            print("ERROR SEMANTICO:".center(TAM))
+            print(f"Nombre de identificado repetido \"{myvar.nombre}\"".center(TAM))
+            print("-"*TAM)
+        
 
+        
     # Enter a parse tree produced by compiladoresParser#cond.
     def enterCond(self, ctx:compiladoresParser.CondContext):
         self.controlTypeLists.append(list())

@@ -86,7 +86,17 @@ instruccion: declaracion PYC
             ;
 
 
-declaracion: tipo ID;
+//declaracion: ;
+//Evaluar idea
+// int x,y,w,z=2;
+declaracion : tipo ID dec
+            | tipo asignacion dec
+            ;
+
+dec : C ID dec
+    | C asignacion dec
+    |
+    ;
 
 tipo  : (INT | VOID | FLOAT | CHAR);
 
@@ -116,36 +126,37 @@ n : NOT inot n
   ;
 
 comp : op c ;
-/*c : MAYOR comp c
+c : MAYOR comp c
   | MENOR comp c
   | MAI comp c
   | MEI comp c
   |
-  ;*/
-c : (MAYOR | MENOR | MAI | MEI) comp  // Comparadores
-  |                                   // Regla vacía permitiendo finalizar sin comparador
   ;
+/*c : (MAYOR | MENOR | MAI | MEI) comp  // Comparadores
+  |                                   // Regla vacía permitiendo finalizar sin comparador
+  ;*/
 
 op : term e ;
-/*e : SUMA op e
+
+e : SUMA op e
   | RESTA op e
 //  | op e
   |
-  ; */
-e : (SUMA | RESTA) op 
+  ; 
+/*e : (SUMA | RESTA) op 
   |                  // Regla vacía permitiendo finalizar sin SUMA o RESTA
   ;
-
+*/
 term : factor t ;
-/*t : MULT factor t 
+t : MULT factor t 
   | DIV factor t
   | MOD factor t
   |
-  ;*/
-t : (MULT | DIV | MOD) factor 
+  ;
+/*t : (MULT | DIV | MOD) factor 
   |                       // Regla vacía permitiendo finalizar sin operador
   ;
-
+*/
 
 factor : NUMERO 
        | ID
@@ -201,10 +212,12 @@ ielse : ELSE instruccion;
 
 ifuncion  : tipo ID PA param PC instruccion;
 
-param : declaracion C param
-      | declaracion
+param : p C param
+      | p
       |
       ;
+
+p : tipo ID;
 
 ireturn : RETURN opal PYC;
 
