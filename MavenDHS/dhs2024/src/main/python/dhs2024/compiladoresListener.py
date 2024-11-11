@@ -44,6 +44,15 @@ class compiladoresListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by compiladoresParser#dec.
+    def enterDec(self, ctx:compiladoresParser.DecContext):
+        pass
+
+    # Exit a parse tree produced by compiladoresParser#dec.
+    def exitDec(self, ctx:compiladoresParser.DecContext):
+        pass
+
+
     # Enter a parse tree produced by compiladoresParser#tipo.
     def enterTipo(self, ctx:compiladoresParser.TipoContext):
         pass
@@ -311,6 +320,15 @@ class compiladoresListener(ParseTreeListener):
 
     # Exit a parse tree produced by compiladoresParser#param.
     def exitParam(self, ctx:compiladoresParser.ParamContext):
+        pass
+
+
+    # Enter a parse tree produced by compiladoresParser#p.
+    def enterP(self, ctx:compiladoresParser.PContext):
+        pass
+
+    # Exit a parse tree produced by compiladoresParser#p.
+    def exitP(self, ctx:compiladoresParser.PContext):
         pass
 
 

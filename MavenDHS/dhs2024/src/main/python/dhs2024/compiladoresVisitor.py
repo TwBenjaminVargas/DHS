@@ -29,6 +29,11 @@ class compiladoresVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by compiladoresParser#dec.
+    def visitDec(self, ctx:compiladoresParser.DecContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by compiladoresParser#tipo.
     def visitTipo(self, ctx:compiladoresParser.TipoContext):
         return self.visitChildren(ctx)
@@ -176,6 +181,11 @@ class compiladoresVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by compiladoresParser#param.
     def visitParam(self, ctx:compiladoresParser.ParamContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by compiladoresParser#p.
+    def visitP(self, ctx:compiladoresParser.PContext):
         return self.visitChildren(ctx)
 
 
