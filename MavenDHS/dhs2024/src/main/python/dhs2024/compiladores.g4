@@ -83,6 +83,7 @@ instruccion: declaracion PYC
             | ifuncion
             | ireturn
             | illamada PYC
+            | iprototipo
             ;
 
 
@@ -203,12 +204,12 @@ iif : IF PA cond PC instruccion
 
 ielse : ELSE instruccion;
 
-//iprototipo : tipo ID PA protoparam PC PYC ;
+iprototipo : tipo ID PA protoparam PC PYC ;
 
-//protoparam : tipo C protoparam
-//      | tipo
-//      |
-//      ;
+protoparam : tipo C protoparam
+      | tipo
+      |
+      ;
 
 ifuncion  : tipo ID PA param PC instruccion;
 

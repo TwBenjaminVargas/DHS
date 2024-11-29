@@ -19,6 +19,7 @@ class Escucha (compiladoresListener):
         self.currentParamLists = list()
         self.currentArgsLists = list()
         self.currentDeclarationList = list()
+        self.currentPrototipeLists = list()
         #stack para tipos usados
         self.vartypeStack = list()
         
@@ -272,23 +273,59 @@ class Escucha (compiladoresListener):
     def exitIfuncion(self, ctx:compiladoresParser.IfuncionContext):
         tipoFuncion = ctx.getChild(0).getText().upper()
         idFuncion = ctx.getChild(1).getText()
-        myFuncion = Funcion(idFuncion,tipoFuncion,True,False,self.currentParamLists)
-        self.tabla.addIdentificador(myFuncion)
-        self.currentParamLists = []
-        #verificar compatibilidad con los datos retornados
-        if not self.itsReturns and tipoFuncion != 'VOID':
-            print("")
-            print("-"*TAM)
-            print("ERROR SEMANTICO:".center(TAM))
-            print(f"Se espera un valor de retorno {tipoFuncion} y no se proporciono ningun retorno".center(TAM))
-            print("-"*TAM)
-            
+
+        # Buscar si se declaro una funcion con ese nombre
+        myprototipo = self.tabla.buscarGlobal(idFuncion)
+        
+        #Si existe el identificador
+        if myprototipo:
+            self.validarCorrespondeciaConPrototipo(myprototipo,tipoFuncion)
+            myprototipo.inicializado = True
+        else: #La creamos   
+            myFuncion = Funcion(idFuncion,tipoFuncion,True,False,self.currentParamLists)
+            self.tabla.addIdentificador(myFuncion)
+            self.currentParamLists = []
+            #verificar compatibilidad con los datos retornados
+            if not self.itsReturns and tipoFuncion != 'VOID':
+                print("")
+                print("-"*TAM)
+                print("ERROR SEMANTICO:".center(TAM))
+                print(f"Se espera un valor de retorno {tipoFuncion} y no se proporciono ningun retorno".center(TAM))
+                print("-"*TAM)
+                
         if self.itsReturns:
             self.verificarTiposRetorno(tipoFuncion)
             self.itsReturns = False
         
         self.inFuncion = False
-        
+
+    def validarCorrespondeciaConPrototipo(self, myprototipo : Funcion, tipostr):
+        """
+            verifica que una funcion cumple con su prototipo o si se repitio un identificador
+        """
+        #verificamos compatibilidad de tipos
+        if tipostr == myprototipo.tipoDato:
+            #verificamos que tenga la misma cantidad de parametros
+            if len(myprototipo.args) == len(self.currentParamLists):
+                for i,protoparam in enumerate(myprototipo.args):
+                    if protoparam.tipoDato != self.currentParamLists[i].tipoDato:
+                        print("")
+                        print("-"*TAM)
+                        print("ERROR SEMANTICO:".center(TAM))
+                        print(f"Los tipos de datos no coinciden con los del prototipo\nse esperaba {protoparam.tipoDato} y se dio {self.currentParamLists[i].tipoDato}".center(TAM))
+                        print("-"*TAM)      
+            else:
+                print("")
+                print("-"*TAM)
+                print("ERROR SEMANTICO:".center(TAM))
+                print(f"Cantidad de argumentos no coincide con el prototipo\n se esperaban {len(myprototipo.args)} y se dieron {len(self.currentParamLists)}".center(TAM))
+                print("-"*TAM)        
+        else:
+            print("")
+            print("-"*TAM)
+            print("ERROR SEMANTICO:".center(TAM))
+            print(f"Tipo de dato de retorno no coincide con el esperado : {protoparam.tipoDato}".center(TAM))
+            print("-"*TAM)
                   
 
     # Enter a parse tree produced by compiladoresParser#param.
@@ -299,6 +336,22 @@ class Escucha (compiladoresListener):
     def exitParam(self, ctx:compiladoresParser.ParamContext):
         self.inParam = False
  
+    # Enter a parse tree produced by compiladoresParser#iprototipo.
+    def enterIprototipo(self, ctx:compiladoresParser.IprototipoContext):
+        self.currentPrototipeLists = []
+
+    def exitIprototipo(self, ctx:compiladoresParser.IprototipoContext):
+        tipoFuncion = ctx.getChild(0).getText().upper()
+        idFuncion = ctx.getChild(1).getText()
+        myFuncion = Funcion(idFuncion,tipoFuncion,False,False,self.currentPrototipeLists)
+        if not self.nombreIdentificadorRepetido(myFuncion):
+            self.tabla.addIdentificador(myFuncion)
+
+    def exitProtoparam(self, ctx:compiladoresParser.ProtoparamContext):
+        vartype = self.vartypeStack[-1]
+        myvar = Variable (vartype,"unnamed",True,False)
+        self.currentPrototipeLists.append(myvar)
+
  # Exit a parse tree produced by compiladoresParser#p.
     def exitP(self, ctx:compiladoresParser.PContext):
         varname = ctx.getChild(1).getText()
@@ -329,27 +382,34 @@ class Escucha (compiladoresListener):
         myfunc = self.tabla.buscarGlobal(id.getText())
         # buscar en la tabla el identificador en caso que no sea una asignacion
         if myfunc :
-            #print(myfunc)
-            if self.inAsignacion:
-                self.compatibilityTypeList.append(myfunc.tipoDato) #añadimos a la lista de control de tipos
-            
-            myfunc.usado = True        
-            # verificamos argumentos
-            if len(myfunc.args) != len(self.currentArgsLists):
+            if myfunc.inicializado:
+                #print(myfunc)
+                if self.inAsignacion:
+                    self.compatibilityTypeList.append(myfunc.tipoDato) #añadimos a la lista de control de tipos
+
+                myfunc.usado = True        
+                # verificamos argumentos
+                if len(myfunc.args) != len(self.currentArgsLists):
+                    print("")
+                    print("-"*TAM)
+                    print("ERROR SEMANTICO:".center(TAM))
+                    print(f"Cantidad de argumentos incompatibles en la llamada a {myfunc.nombre}".center(TAM))
+                    print("-"*TAM)
+                else:
+                    for i , arg in enumerate(myfunc.args):
+                        if arg.tipoDato != self.currentArgsLists[i].tipoDato:
+                            print("")
+                            print("-"*TAM)
+                            print("ERROR SEMANTICO:".center(TAM))
+                            print(f"Tipo de argumento incompatible, se espera {arg.tipoDato} y se dio {self.currentParamLists[i].tipoDato}".center(TAM))
+                            print("-"*TAM)
+                self.currentArgsLists = []
+            else:
                 print("")
                 print("-"*TAM)
                 print("ERROR SEMANTICO:".center(TAM))
-                print("Cantidad de argumentos incompatibles".center(TAM))
-                print("-"*TAM)
-            else:
-                for i , arg in enumerate(myfunc.args):
-                    if arg.tipoDato != self.currentArgsLists[i].tipoDato:
-                        print("")
-                        print("-"*TAM)
-                        print("ERROR SEMANTICO:".center(TAM))
-                        print(f"Tipo de argumento incompatible, se espera {arg.tipoDato} y se dio {self.currentParamLists[i].tipoDato}".center(TAM))
-                        print("-"*TAM)
-            self.currentArgsLists = []
+                print(f"funcion {id.getText()} no inicializada".center(TAM))
+                print("-"*TAM) 
         else: 
             print("")
             print("-"*TAM)
