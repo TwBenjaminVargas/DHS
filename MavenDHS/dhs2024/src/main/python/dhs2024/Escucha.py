@@ -81,7 +81,7 @@ class Escucha (compiladoresListener):
                 print("")
                 print("-"*TAM)
                 print("ERROR SEMANTICO:".center(TAM))
-                print("Identificador \"{}\" no inicializado".format(id.getText()).center(TAM))
+                print("Identificador \"{}\" no inicializado".format(idstr).center(TAM))
                 print("-"*TAM)
             myvar.usado = True
             self.compatibilityTypeList.append(myvar.tipoDato)
@@ -90,7 +90,7 @@ class Escucha (compiladoresListener):
             print("")
             print("-"*TAM)
             print("ERROR SEMANTICO:".center(TAM))
-            print("Identificador \"{}\" no definido".format(id.getText()).center(TAM))
+            print("Identificador \"{}\" no definido".format(idstr).center(TAM))
             print("-"*TAM)
             return None
         
