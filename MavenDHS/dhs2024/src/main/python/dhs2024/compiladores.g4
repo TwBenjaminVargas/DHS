@@ -101,8 +101,9 @@ dec : C ID dec
 
 tipo  : (INT | VOID | FLOAT | CHAR);
 
+// corregir para permitir la combinacion de los mismos
 asignacion: ID ASIG opal
-          | ID ASIG illamada // para primeras versiones se usara asi
+          | ID ASIG illamada
           ;
 
 opal : exp ; //completar

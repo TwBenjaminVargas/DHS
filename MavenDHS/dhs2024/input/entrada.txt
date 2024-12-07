@@ -1,8 +1,4 @@
-
-f(j);
-int f(int x)
-{
-    return x;
-}
-int j = 0;
-int f(int, int);
+int a;
+a = 1 + 2*3;
+int c;
+int b;
