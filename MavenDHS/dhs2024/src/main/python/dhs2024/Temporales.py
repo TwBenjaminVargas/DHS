@@ -15,7 +15,6 @@ class Temporales:
     def isEmpty(self):
         if not self.tmp:
             return True
-        
     def getTop(self):
         return self.tmp[-1]
     
