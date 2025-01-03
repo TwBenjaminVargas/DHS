@@ -27,6 +27,8 @@ class Walker (compiladoresVisitor):
             if ctx.getChild(1).getChildCount() > 0: # es parte de un termino complejo
                 self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1][-1]} {ctx.getChild(1).getChild(0).getText()} {ctx.getChild(1).getChild(1).getText()}")
                 self.visitT(ctx.getChild(1).getChild(2))
+                #VER SI GENERA ERROR EN 1*(1*2)*3*4
+                self.temporalesTerminales[-1].append(self.temporales.getTop())
             else:
                 self.isSimpleTerm = False
             return None
@@ -38,8 +40,20 @@ class Walker (compiladoresVisitor):
         
         if self.isSimpleTerm and len(self.temporalesTerminales[-1]) == 0:
             self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getText()}")
-        elif not self.isSimpleTerm:
-            self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getChild(0).getText()} {ctx.getChild(1).getChild(0).getText()} {ctx.getChild(1).getChild(1).getText()}")
+        elif not self.isSimpleTerm: #inicia  calculo de producto
+            if "(" in ctx.getChild(1).getChild(1).getText():#se multiplica/divide por un producto
+                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getChild(0).getText()}")
+                self.temporalesTerminales[-1].append(self.temporales.getTop())
+                self.visitExp(ctx.getChild(1).getChild(1).getChild(1)) # calculamos expresion dentro de parentesis
+                op =f"{self.temporalesTerminales[-1][-2]} {ctx.getChild(1).getChild(0).getText()} {self.temporalesTerminales[-1][-1]}"
+                #limpiamos pila
+                self.temporalesTerminales[-1].pop()
+                self.temporalesTerminales[-1].pop()
+                #añadimos linea de codigo
+                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {op}")
+            else:
+                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getChild(0).getText()} {ctx.getChild(1).getChild(0).getText()} {ctx.getChild(1).getChild(1).getText()}")
+            
             self.visitT(ctx.getChild(1).getChild(2))
         
         self.temporalesTerminales[-1].append(self.temporales.getTop())
@@ -61,9 +75,8 @@ class Walker (compiladoresVisitor):
             self.visitTerm(ctx.getChild(1).getChild(0))
             op = ""
             if self.isSimpleTerm:
-                op =f"{self.temporalesTerminales[-1][-1]} {ctx.getChild(0).getText()} {ctx.getChild(1).getText()}"
+                op =f"{self.temporalesTerminales[-1][-1]} {ctx.getChild(0).getText()} {ctx.getChild(1).getChild(0).getText()}"
             else:
-                print(f"Nodo {ctx.getText()}")
                 op =f"{self.temporalesTerminales[-1][-2]} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1][-1]}"
             
             self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {op}")
