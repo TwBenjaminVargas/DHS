@@ -1,3 +1,4 @@
-int i, z  = 0, x = 1;
-for(i = 0; i < x; i = i + 1)
-	z = 2 * x;
+int i = 0, j = 0;
+while(i < 10)
+	while(j < 10)
+		i = i +1;
