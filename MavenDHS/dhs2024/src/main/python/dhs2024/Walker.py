@@ -174,3 +174,18 @@ class Walker (compiladoresVisitor):
         self.codigoIntermedio.addLine(f"jmp {self.etiquetaList.pop()}")
         self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
         return None
+    
+    
+    def visitIwhile(self, ctx:compiladoresParser.IwhileContext):
+        self.codigoIntermedio.addLine(f"label {self.etiqueta.generateLabel()}")
+        self.etiquetaList.append(self.etiqueta.getLabel())
+        super().visitCond(ctx.getChild(2))
+        self.codigoIntermedio.addLine(f"ifnjmp {self.temporalesTerminales[-1][-1]}, {self.etiqueta.generateLabel()}")
+        self.etiquetaList.append(self.etiqueta.getLabel())
+        # invertimos posiciones
+        self.etiquetaList[-1],self.etiquetaList[-2] = self.etiquetaList[-2], self.etiquetaList[-1]
+        # cuerpo del while
+        super().visitInstruccion(ctx.getChild(4))
+        self.codigoIntermedio.addLine(f"jmp {self.etiquetaList.pop()}")
+        self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
+        return None
