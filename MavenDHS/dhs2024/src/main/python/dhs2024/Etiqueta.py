@@ -2,7 +2,6 @@ class Etiqueta:
     
     def __init__(self):
        self.index = 0
-       # FIFO de etiquetas
        self.lbl = list()
        self.history = list()
     
@@ -14,5 +13,5 @@ class Etiqueta:
     
     def getLabel(self):
         if self.lbl:
-            return self.lbl.pop(0)
+            return self.lbl.pop()
         return None
