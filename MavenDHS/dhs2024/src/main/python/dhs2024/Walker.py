@@ -9,6 +9,7 @@ class Walker (compiladoresVisitor):
         self.codigoIntermedio = IntermediateCode("src/main/python/dhs2024/out/cod.txt")
         self.temporales = Temporales()
         self.etiqueta = Etiqueta()
+        self.etiquetaList = list()
         self.temporalesTerminales = list()
         self.isSimpleTerm = False
         self.isInComparacion = False
@@ -136,16 +137,40 @@ class Walker (compiladoresVisitor):
             ielse = True
         super().visitCond(ctx.getChild(2))
         self.codigoIntermedio.addLine(f"ifnjmp {self.temporalesTerminales[-1][-1]}, {self.etiqueta.generateLabel()}")
+        self.etiquetaList.append(self.etiqueta.getLabel())
         super().visitInstruccion(ctx.getChild(4))
         # verificamos que tenga else
         if ielse:
             self.codigoIntermedio.addLine(f"jmp {self.etiqueta.generateLabel()}")
-        self.codigoIntermedio.addLine(f"label {self.etiqueta.getLabel()}")
+            self.etiquetaList.append(self.etiqueta.getLabel())
+            # intercambiamos posiciones en la lista para cuando sean llamadas
+            self.etiquetaList[-1],self.etiquetaList[-2] = self.etiquetaList[-2], self.etiquetaList[-1]
+        self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
         if ielse:
             self.visitIelse(ctx.getChild(5)) 
         return None
     
     def visitIelse(self, ctx:compiladoresParser.IelseContext):
         super().visitInstruccion(ctx.getChild(1))
-        self.codigoIntermedio.addLine(f"label {self.etiqueta.getLabel()}")
+        self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
+        return None
+    
+    def visitIfor(self, ctx:compiladoresParser.IforContext):
+        # lista de iniciacion
+        super().visitInit(ctx.getChild(2))
+        self.codigoIntermedio.addLine(f"label {self.etiqueta.generateLabel()}")
+        self.etiquetaList.append(self.etiqueta.getLabel())
+        # lista de condicion
+        super().visitCondlist(ctx.getChild(4))
+        self.codigoIntermedio.addLine(f"ifnjmp {self.temporalesTerminales[-1][-1]}, {self.etiqueta.generateLabel()}")
+        self.etiquetaList.append(self.etiqueta.getLabel())
+        # invertimos posiciones
+        self.etiquetaList[-1],self.etiquetaList[-2] = self.etiquetaList[-2], self.etiquetaList[-1]
+        
+        # cuerpo del for
+        super().visitInstruccion(ctx.getChild(8))
+        # lista de iteracion
+        super().visitIter(ctx.getChild(6))
+        self.codigoIntermedio.addLine(f"jmp {self.etiquetaList.pop()}")
+        self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
         return None
