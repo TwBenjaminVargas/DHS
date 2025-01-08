@@ -37,39 +37,42 @@ class Escucha (compiladoresListener):
             imprime error
         """
         if tipoFuncion == 'INT':
-            if 'FLOAT' in self.compatibilityTypeList:
+            if 'FLOAT' in self.compatibilityTypeList[-1]:
                 print("")
                 print("-"*TAM)
                 print("ERROR SEMANTICO:".center(TAM))
                 print("Intento retonar FLOAT cuando se espera INT".center(TAM))
                 print("-"*TAM)
         if tipoFuncion == 'CHAR':
-            if 'FLOAT' in self.compatibilityTypeList:
+            if 'FLOAT' in self.compatibilityTypeList[-1]:
                 print("")
                 print("-"*TAM)
                 print("ERROR SEMANTICO:".center(TAM))
                 print("Intento retornar FLOAT cuando se espera CHAR".center(TAM))
                 print("-"*TAM)
                 
-    def validarCompatibilidadTipos(self,tipodato):
+    def validarCompatibilidadTipos(self,tipodato,list):
         """
             Verifica la control list con el tipo esperado, si no son compatibles emite
-            mensaje de error
+            mensaje de error y retorna False
         """
         if tipodato == 'INT':
-            if 'FLOAT' in self.compatibilityTypeList:
+            if 'FLOAT' in list:
                 print("")
                 print("-"*TAM)
                 print("ERROR SEMANTICO:".center(TAM))
                 print("Intento asignar FLOAT a INT".center(TAM))
                 print("-"*TAM)
+                return False
         if tipodato == 'CHAR':
-            if 'FLOAT' in self.compatibilityTypeList:
+            if 'FLOAT' in list:
                 print("")
                 print("-"*TAM)
                 print("ERROR SEMANTICO:".center(TAM))
                 print("Intento asignar FLOAT a CHAR".center(TAM))
                 print("-"*TAM)
+                return False
+        return True
                 
     def verificarIDInicializado(self,idstr):
         """
@@ -84,7 +87,7 @@ class Escucha (compiladoresListener):
                 print("Identificador \"{}\" no inicializado".format(idstr).center(TAM))
                 print("-"*TAM)
             myvar.usado = True
-            self.compatibilityTypeList.append(myvar.tipoDato)
+            self.compatibilityTypeList[-1].append(myvar.tipoDato)
             
         else:
             print("")
@@ -204,7 +207,7 @@ class Escucha (compiladoresListener):
     
     
     def enterAsignacion(self, ctx:compiladoresParser.AsignacionContext):
-        self.compatibilityTypeList = []
+        self.compatibilityTypeList .append([])
         self.inAsignacion = True
         
     def exitAsignacion(self, ctx:compiladoresParser.AsignacionContext):
@@ -218,9 +221,12 @@ class Escucha (compiladoresListener):
         
         # valida asignacion y establece inicializada
         if myvar:
-            self.validarCompatibilidadTipos(myvar.tipoDato)
+            self.validarCompatibilidadTipos(myvar.tipoDato,self.compatibilityTypeList[-1])
             myvar.inicializado = True
         self.inAsignacion = False
+        
+        #limpiar lista de compatibilidad
+        self.compatibilityTypeList.pop()
     
       
     def obtenerIdentificadorDeclarado(self,idstr):
@@ -242,11 +248,11 @@ class Escucha (compiladoresListener):
             Añade a la lista de control un tipo segun su token
         """
         if ctx.getToken(compiladoresParser.NUMERO, 0):
-            self.compatibilityTypeList.append("INT")
+            self.compatibilityTypeList[-1].append("INT")
         if ctx.getToken(compiladoresParser.DECIMAL, 0):
-            self.compatibilityTypeList.append("FLOAT")
+            self.compatibilityTypeList[-1].append("FLOAT")
         if ctx.getToken(compiladoresParser.CARACTER, 0):
-            self.compatibilityTypeList.append("CHAR")
+            self.compatibilityTypeList[-1].append("CHAR")
             
                    
     def exitFactor(self, ctx:compiladoresParser.FactorContext):
@@ -295,6 +301,8 @@ class Escucha (compiladoresListener):
                 
         if self.itsReturns:
             self.verificarTiposRetorno(tipoFuncion)
+            # quitamos la lista de retorno
+            self.compatibilityTypeList.pop()
             self.itsReturns = False
         
         self.inFuncion = False
@@ -362,12 +370,14 @@ class Escucha (compiladoresListener):
 
     # Enter a parse tree produced by compiladoresParser#cond.
     def enterCond(self, ctx:compiladoresParser.CondContext):
-        self.compatibilityTypeList = []
-
+        self.compatibilityTypeList.append([])
+        
+    def exitCond(self, ctx:compiladoresParser.CondContext):
+        self.compatibilityTypeList.pop()
     
     # Enter a parse tree produced by compiladoresParser#ireturn.
     def enterIreturn(self, ctx:compiladoresParser.IreturnContext):
-        self.compatibilityTypeList = []
+        self.compatibilityTypeList.append([])
         if not self.inFuncion :
             print("")
             print("-"*TAM)
@@ -375,7 +385,12 @@ class Escucha (compiladoresListener):
             print("Utilizacion de un return sin funcion".center(TAM))
             print("-"*TAM)
         self.itsReturns = True
-
+    
+    # Exit a parse tree produced by compiladoresParser#ireturn.
+    # Se quita la lista de compatibilidad de retorno en el llamado a la funcion
+    #def exitIreturn(self, ctx:compiladoresParser.IreturnContext):
+        #self.compatibilityTypeList.pop()
+        
 
     def exitIllamada(self, ctx:compiladoresParser.IllamadaContext):
         id = ctx.getChild(0)
@@ -385,10 +400,14 @@ class Escucha (compiladoresListener):
             if myfunc.inicializado:
                 #print(myfunc)
                 if self.inAsignacion:
-                    self.compatibilityTypeList.append(myfunc.tipoDato) #añadimos a la lista de control de tipos
+                    self.compatibilityTypeList[-1].append(myfunc.tipoDato) #añadimos a la lista de control de tipos
 
-                myfunc.usado = True        
+                myfunc.usado = True
+                     
                 # verificamos argumentos
+                #invertimos la lista dado que es necesario para correspondencia
+                self.currentArgsLists.reverse()
+                
                 if len(myfunc.args) != len(self.currentArgsLists):
                     print("")
                     print("-"*TAM)
@@ -397,11 +416,11 @@ class Escucha (compiladoresListener):
                     print("-"*TAM)
                 else:
                     for i , arg in enumerate(myfunc.args):
-                        if arg.tipoDato != self.currentArgsLists[i].tipoDato:
+                        if not self.validarCompatibilidadTipos(arg.tipoDato,self.currentArgsLists[i]):
                             print("")
                             print("-"*TAM)
                             print("ERROR SEMANTICO:".center(TAM))
-                            print(f"Tipo de argumento incompatible, se espera {arg.tipoDato} y se dio {self.currentParamLists[i].tipoDato}".center(TAM))
+                            print(f"Tipo de argumento incompatible, se espera {arg.tipoDato} y se dio {self.currentArgsLists[i]}".center(TAM))
                             print("-"*TAM)
                 self.currentArgsLists = []
             else:
@@ -416,21 +435,31 @@ class Escucha (compiladoresListener):
             print("ERROR SEMANTICO:".center(TAM))
             print(f"funcion {id.getText()} no declarada".center(TAM))
             print("-"*TAM)
-        
+
+    
+    def enterArgumento(self, ctx:compiladoresParser.ArgumentoContext):
+        # añadimos una lista por cada argumento
+        self.compatibilityTypeList.append([])
         
         
     # Exit a parse tree produced by compiladoresParser#argumento.
     # Por el momento solo acepta variables como argumentos
     def exitArgumento(self, ctx:compiladoresParser.ArgumentoContext):
-         id = ctx.getToken(compiladoresParser.ID, 0)
-         if id:
-            arg = self.obtenerIdentificadorDeclarado(id.getText())
-            if arg:
-                self.currentArgsLists.append(arg)
-                arg.usado = True
-            
-
-
+         # verifico el tipo del opal argumento y lo añado a la lista de argumentos
+         self.currentArgsLists.append(self.verificarTipoOpal(self.compatibilityTypeList.pop()))
+         # recordar que estan siendo acomodados de atras para adelante
+                
+    def verificarTipoOpal(self, listaTipos):
+        """Verifica en una lista de tipos cual es el tipo de dato predominante o si hay tipos combinados
+        Retorna una lista con el tipo o los tipos del opal"""
+        tlist = list()
+        t = listaTipos[0]
+        for tipo in listaTipos:
+            if tipo != t:
+                tlist.append(tipo)
+        tlist.append(t)
+        return tlist
+    
     def visitTerminal(self, node: TerminalNode):
         #print("-----> Token: " + node.getText())
         self.numTokens +=1

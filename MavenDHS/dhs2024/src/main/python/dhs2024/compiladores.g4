@@ -103,7 +103,7 @@ tipo  : (INT | VOID | FLOAT | CHAR);
 
 // corregir para permitir la combinacion de los mismos
 asignacion: ID ASIG opal
-          | ID ASIG illamada
+//          | ID ASIG illamada
           ;
 
 opal : exp ; //completar
@@ -167,6 +167,7 @@ factor : NUMERO
        | PA exp PC
        | suf
        | pref
+       | illamada
        ;
 
 
@@ -225,8 +226,8 @@ ireturn : RETURN opal PYC;
 
 illamada : ID PA argumento PC;
 
-argumento : ID C argumento
-          | ID
+argumento : opal C argumento
+          | opal
           |
           ;
 

@@ -19,12 +19,12 @@ class Walker (compiladoresVisitor):
         return super().visitPrograma(ctx)
     
     def visitInstruccion(self, ctx:compiladoresParser.InstruccionContext):
-        print(f"Instruccion: {ctx.getText()}")
+        #print(f"Instruccion: {ctx.getText()}")
         return super().visitInstruccion(ctx)
     
     def visitAsignacion(self, ctx:compiladoresParser.AsignacionContext):
         super().visitAsignacion(ctx)
-        print(self.temporalesTerminales)
+        #print(self.temporalesTerminales)
         self.codigoIntermedio.addLine(f"{ctx.getChild(0).getText()} = {self.temporalesTerminales[-1][-1]}")
         # Limpiamos la pila de temporales terminales para la siguiente operacion
         self.temporalesTerminales = []
@@ -71,7 +71,7 @@ class Walker (compiladoresVisitor):
             self.visitT(ctx.getChild(1).getChild(2))
         
         self.temporalesTerminales[-1].append(self.temporales.getTop())
-        print(f"Añadi el {self.temporalesTerminales[-1][-1]}")
+        #print(f"Añadi el {self.temporalesTerminales[-1][-1]}")
         return None
     
     def visitExp(self, ctx:compiladoresParser.ExpContext):
