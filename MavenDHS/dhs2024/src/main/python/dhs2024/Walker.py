@@ -10,6 +10,7 @@ class Walker (compiladoresVisitor):
         self.temporales = Temporales()
         self.etiqueta = Etiqueta()
         self.etiquetaList = list()
+        self.etiquetaFuncion = dict()
         self.temporalesTerminales = list()
         self.isSimpleTerm = False
         self.isInComparacion = False
@@ -30,11 +31,16 @@ class Walker (compiladoresVisitor):
         self.temporalesTerminales = []
     
     def visitTerm(self, ctx:compiladoresParser.TermContext):
-                
+        
+        # si el factor es una llamada a funcion (primer termio)
+        #if ctx.getChild(0).getChild(0).getChildCount() == 4:
+            
+                    
         if ctx.getChild(0).getChildCount() > 1:
             super().visitFactor(ctx.getChild(0))
             # Si el termino en parentesis es la primera parte de un producto/division
-            if ctx.getChild(1).getChildCount() > 0: 
+            if ctx.getChild(1).getChildCount() > 0:
+                #error en ()*()
                 self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1][-1]} {ctx.getChild(1).getChild(0).getText()} {ctx.getChild(1).getChild(1).getText()}")
                 # Limpiamos el temporal del termino con parentesis ya que no lo queremos guardar
                 self.temporalesTerminales[-1].pop()
@@ -101,6 +107,7 @@ class Walker (compiladoresVisitor):
     
     
     def visitT(self, ctx:compiladoresParser.TContext):
+        # error en ()*()*()
         if ctx.getChildCount() > 0:
                 op = f"{self.temporales.getTop()} {ctx.getChild(0).getText()} {ctx.getChild(1).getText()}"
                 self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {op}")
@@ -175,7 +182,6 @@ class Walker (compiladoresVisitor):
         self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
         return None
     
-    
     def visitIwhile(self, ctx:compiladoresParser.IwhileContext):
         self.codigoIntermedio.addLine(f"label {self.etiqueta.generateLabel()}")
         self.etiquetaList.append(self.etiqueta.getLabel())
@@ -188,4 +194,30 @@ class Walker (compiladoresVisitor):
         super().visitInstruccion(ctx.getChild(4))
         self.codigoIntermedio.addLine(f"jmp {self.etiquetaList.pop()}")
         self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
+        return None
+    
+    def visitIfuncion(self, ctx:compiladoresParser.IfuncionContext):
+        self.codigoIntermedio.addLine(f"label {self.etiqueta.generateLabel()}")
+        self.etiquetaFuncion[ctx.getChild(1).getText()] = self.etiqueta.getLabel()
+        self.codigoIntermedio.addLine(f"pop {self.temporales.generateTemp()}")
+        jmppos = self.temporales.getTop()
+        self.visitParam(ctx.getChild(3))
+        super().visitInstruccion(ctx.getChild(5))
+        self.codigoIntermedio.addLine(f"jmp {jmppos}")
+        return None
+    
+    def visitParam(self, ctx:compiladoresParser.ParamContext):
+        if ctx.getChildCount() == 3:
+            self.visitParam(ctx.getChild(2))
+        if ctx.getChildCount() > 0:   
+            self.visitP(ctx.getChild(0))       
+        return None
+    
+    def visitP(self, ctx:compiladoresParser.PContext):
+        self.codigoIntermedio.addLine(f"pop {ctx.getChild(1).getText()}")
+        return None
+    
+    def visitIreturn(self, ctx:compiladoresParser.IreturnContext):
+        super().visitOpal(ctx.getChild(1))
+        self.codigoIntermedio.addLine(f"push {self.temporalesTerminales[-1][-1]}")
         return None

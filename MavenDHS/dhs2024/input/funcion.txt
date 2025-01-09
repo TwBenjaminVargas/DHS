@@ -1,0 +1,8 @@
+int f(int a, int b)
+{
+	return a + b;
+}
+
+int x, o = 1, p = 2;
+
+x = f(o,p)*2;
