@@ -35,6 +35,10 @@ class Walker (compiladoresVisitor):
         # primer termino llamada a funcion
         if ctx.getChild(0).getChild(0).getChildCount() == 4:
             self.visitIllamada(ctx.getChild(0).getChild(0))
+            if ctx.getChild(1).getChildCount() > 0:
+                self.visitT(ctx.getChild(1))
+                self.temporalesTerminales[-1].append(self.temporales.getTop())
+            return None
             
         # primer termino contiene parentesis           
         if ctx.getChild(0).getChildCount() > 1:
@@ -58,13 +62,15 @@ class Walker (compiladoresVisitor):
             self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getText()}")
         # Inicia  calculo de producto
         elif not self.isSimpleTerm:
-            if ctx.getChild(1).getChild(1).getChildCount() == 1: #segundo termino es simple
-                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getChild(0).getText()} {ctx.getChild(1).getChild(0).getText()} {ctx.getChild(1).getChild(1).getText()}")
-                self.visitT(ctx.getChild(1).getChild(2))
-            else: # segundo termino del producto/division es un parentesis
+            if ctx.getChild(1).getChild(1).getChildCount() == 3:# segundo termino del producto/division es un parentesis
                 self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getChild(0).getText()}")
                 self.visitT(ctx.getChild(1))
-        print(self.codigoIntermedio.showCodeStatus())
+            elif isinstance(ctx.getChild(1).getChild(1).getChild(0),compiladoresParser.IllamadaContext): # segundo es una llamada
+                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getChild(0).getText()}")
+                self.visitT(ctx.getChild(1))
+            else: #segundo termino es simple
+                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getChild(0).getText()} {ctx.getChild(1).getChild(0).getText()} {ctx.getChild(1).getChild(1).getText()}")
+                self.visitT(ctx.getChild(1).getChild(2))
         self.temporalesTerminales[-1].append(self.temporales.getTop())
         #print(f"Añadi el {self.temporalesTerminales[-1][-1]}")
         return None
@@ -101,6 +107,11 @@ class Walker (compiladoresVisitor):
                 # metemos el temporal anterior dentro de los terminales
                 self.temporalesTerminales[-1].append(self.temporales.getTop())
                 self.visitExp(ctx.getChild(1).getChild(1))
+                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1].pop(-2)} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1].pop()}")
+                self.visitT(ctx.getChild(2))
+            elif isinstance(ctx.getChild(1).getChild(0), compiladoresParser.IllamadaContext): #hay una llamada
+                self.temporalesTerminales[-1].append(self.temporales.getTop())
+                self.visitIllamada(ctx.getChild(1).getChild(0))
                 self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1].pop(-2)} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1].pop()}")
                 self.visitT(ctx.getChild(2))
             else:
@@ -222,14 +233,20 @@ class Walker (compiladoresVisitor):
         self.visitArgumento(ctx.getChild(2))
         self.codigoIntermedio.addLine(f"push {self.etiqueta.generateLabel()}")
         lblrtn = self.etiqueta.getLabel()
+        self.codigoIntermedio.addLine(f"jmp {self.etiquetaFuncion[ctx.getChild(0).getText()]}")
+        self.codigoIntermedio.addLine(f"label {lblrtn}")
+        if isinstance (ctx.parentCtx,compiladoresParser.FactorContext):
+            self.codigoIntermedio.addLine(f"pop {self.temporales.generateTemp()}")
+            self.temporalesTerminales[-1].append(self.temporales.getTop())
         return None
     
     def visitArgumento(self, ctx:compiladoresParser.ArgumentoContext):
         # va a haber problemas cuando quieras mandar una valriable sola
         if ctx.getChildCount() > 0:
+            self.temporalesTerminales.append([])
             super().visitOpal(ctx.getChild(0))
             self.codigoIntermedio.addLine(f"push {self.temporalesTerminales[-1][-1]}")
-            self.temporalesTerminales = []
+            self.temporalesTerminales.pop()
             # hay mas argumentos
             if ctx.getChildCount() > 1:
                 self.visitArgumento(ctx.getChild(2))
