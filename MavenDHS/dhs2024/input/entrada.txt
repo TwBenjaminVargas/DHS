@@ -1,1 +1,15 @@
-int a = (2 * 3) + (2 + 4) + (3 * 1);
+int f(int a, int b)
+{
+	return a + b;
+}
+
+int g(int a, int b)
+{
+	int f = 2 * 5;
+	return a + f;
+}
+
+int x, o = 1, p = 2;
+
+x = f(o,p);
+x = g(o,p)
