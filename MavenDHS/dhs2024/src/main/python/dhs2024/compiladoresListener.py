@@ -1,4 +1,4 @@
-# Generated from /home/ben/Documentos/DHS/MavenDHS/dhs2024/src/main/python/dhs2024/compiladores.g4 by ANTLR 4.13.1
+# Generated from /home/antobadami/Documentos/proyectodhs/DHS/MavenDHS/dhs2024/src/main/python/dhs2024/compiladores.g4 by ANTLR 4.13.1
 from antlr4 import *
 if "." in __name__:
     from .compiladoresParser import compiladoresParser
@@ -203,24 +203,6 @@ class compiladoresListener(ParseTreeListener):
 
     # Exit a parse tree produced by compiladoresParser#factor.
     def exitFactor(self, ctx:compiladoresParser.FactorContext):
-        pass
-
-
-    # Enter a parse tree produced by compiladoresParser#suf.
-    def enterSuf(self, ctx:compiladoresParser.SufContext):
-        pass
-
-    # Exit a parse tree produced by compiladoresParser#suf.
-    def exitSuf(self, ctx:compiladoresParser.SufContext):
-        pass
-
-
-    # Enter a parse tree produced by compiladoresParser#pref.
-    def enterPref(self, ctx:compiladoresParser.PrefContext):
-        pass
-
-    # Exit a parse tree produced by compiladoresParser#pref.
-    def exitPref(self, ctx:compiladoresParser.PrefContext):
         pass
 
 

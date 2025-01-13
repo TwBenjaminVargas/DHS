@@ -261,16 +261,6 @@ class Escucha (compiladoresListener):
         if id:
             self.verificarIDInicializado(id.getText())
         
-    def exitSuf(self, ctx:compiladoresParser.SufContext):
-        id = ctx.getToken(compiladoresParser.ID, 0)
-        if id: # si encuentro un nodo ID
-            self.verificarIDInicializado(id.getText())
-    
-    
-    def exitPref(self, ctx:compiladoresParser.PrefContext):
-        id = ctx.getToken(compiladoresParser.ID, 0)
-        if id: # si encuentro un nodo ID
-            self.verificarIDInicializado(id.getText())
             
 
     def enterIfuncion(self, ctx:compiladoresParser.IfuncionContext):
@@ -397,6 +387,13 @@ class Escucha (compiladoresListener):
         myfunc = self.tabla.buscarGlobal(id.getText())
         # buscar en la tabla el identificador en caso que no sea una asignacion
         if myfunc :
+            # si encuetra el identificador pero es una variable
+            if isinstance(myfunc, Variable):
+                print("")
+                print("-"*TAM)
+                print("ERROR SEMANTICO:".center(TAM))
+                print(f"{myfunc.nombre} no es una funcion".center(TAM))
+                print("-"*TAM)
             if myfunc.inicializado:
                 #print(myfunc)
                 if self.inAsignacion:
