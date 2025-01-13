@@ -38,6 +38,7 @@ class Walker (compiladoresVisitor):
             if ctx.getChild(1).getChildCount() > 0:
                 self.visitT(ctx.getChild(1))
                 self.temporalesTerminales[-1].append(self.temporales.getTop())
+            self.isSimpleTerm = False
             return None
             
         # primer termino contiene parentesis           
@@ -170,22 +171,26 @@ class Walker (compiladoresVisitor):
     
     def visitIfor(self, ctx:compiladoresParser.IforContext):
         # lista de iniciacion
-        super().visitInit(ctx.getChild(2))
+        if ctx.getChild(2).getChildCount() > 0:
+            super().visitInit(ctx.getChild(2))
         self.codigoIntermedio.addLine(f"label {self.etiqueta.generateLabel()}")
         self.etiquetaList.append(self.etiqueta.getLabel())
         # lista de condicion
-        super().visitCondlist(ctx.getChild(4))
-        self.codigoIntermedio.addLine(f"ifnjmp {self.temporalesTerminales[-1][-1]}, {self.etiqueta.generateLabel()}")
-        self.etiquetaList.append(self.etiqueta.getLabel())
-        # invertimos posiciones
-        self.etiquetaList[-1],self.etiquetaList[-2] = self.etiquetaList[-2], self.etiquetaList[-1]
+        if ctx.getChild(4).getChildCount() > 0:
+            super().visitCondlist(ctx.getChild(4))
+            self.codigoIntermedio.addLine(f"ifnjmp {self.temporalesTerminales[-1][-1]}, {self.etiqueta.generateLabel()}")
+            self.etiquetaList.append(self.etiqueta.getLabel())
+            # invertimos posiciones
+            self.etiquetaList[-1],self.etiquetaList[-2] = self.etiquetaList[-2], self.etiquetaList[-1]
         
         # cuerpo del for
         super().visitInstruccion(ctx.getChild(8))
         # lista de iteracion
-        super().visitIter(ctx.getChild(6))
+        if ctx.getChild(6).getChildCount() > 0:
+            super().visitIter(ctx.getChild(6))
         self.codigoIntermedio.addLine(f"jmp {self.etiquetaList.pop()}")
-        self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
+        if ctx.getChild(4).getChildCount() > 0:
+            self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
         return None
     
     def visitIwhile(self, ctx:compiladoresParser.IwhileContext):

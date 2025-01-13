@@ -165,16 +165,8 @@ factor : NUMERO
        | DECIMAL
        | CARACTER
        | PA exp PC
-       | suf
-       | pref
        | illamada
        ;
-
-
-suf : ID (INC | DEC);
-
-pref  :  (INC | DEC)  ID;
-
 
 
 iwhile  :  WHILE PA cond PC instruccion ;
@@ -195,10 +187,8 @@ init  : asignacion
 condlist  : cond
           |
           ;
-iter  : 
-      | asignacion
-      | suf
-      | pref
+iter  : asignacion
+      |
       ;
 
 iif : IF PA cond PC instruccion

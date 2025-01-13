@@ -1,40 +1,14 @@
+t0 = 0
+i = t0
 label l0
-pop t0
-pop b
-pop a
-t1 = a
-t2 = t1 + b
-push t2
-jmp t0
-label l1
-pop t3
-pop b
-pop a
-t4 = 2 * 5
-f = t4
-t5 = a
-t6 = t5 + f
-push t6
-jmp t3
-t7 = 1
-o = t7
-t8 = 2
-p = t8
-t9 = o
-push t9
-t10 = p
-push t10
-push l2
+t1 = x
+t2 = 0
+t3 = t1 > t2
+ifnjmp t3, l1
+t4 = 0
+x = t4
+t5 = x
+t6 = t5 + 1
+x = t6
 jmp l0
-label l2
-pop t11
-x = t11
-t12 = o
-push t12
-t13 = p
-push t13
-push l3
-jmp l1
-label l3
-pop t14
-x = t14
+label l1
