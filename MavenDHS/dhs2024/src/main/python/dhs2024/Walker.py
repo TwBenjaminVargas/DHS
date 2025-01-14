@@ -28,6 +28,7 @@ class Walker (compiladoresVisitor):
         #print(self.temporalesTerminales)
         self.codigoIntermedio.addLine(f"{ctx.getChild(0).getText()} = {self.temporalesTerminales[-1][-1]}")
         # Limpiamos la pila de temporales terminales para la siguiente operacion
+        print(self.temporalesTerminales)
         self.temporalesTerminales = []
     
     def visitTerm(self, ctx:compiladoresParser.TermContext):
@@ -59,7 +60,7 @@ class Walker (compiladoresVisitor):
         else:
             self.isSimpleTerm = False
         
-        if self.isSimpleTerm and (len(self.temporalesTerminales[-1]) == 0 or self.isInComparacion):
+        if self.isSimpleTerm and len(self.temporalesTerminales[-1]) == 0:
             self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getText()}")
         # Inicia  calculo de producto
         elif not self.isSimpleTerm:
@@ -122,27 +123,28 @@ class Walker (compiladoresVisitor):
         return None
     
     def visitComp(self, ctx:compiladoresParser.CompContext):
-        """
-         Al visitarse una comparacion se establece una bandera isInComparacion y se calcula
-         el primer termino de la misma, luego se trabaja con el nodo C
-        """
-        super().visitOp(ctx.getChild(0))
-        if ctx.getChild(1).getChildCount() > 0:
-            self.isInComparacion = True
+        # no esta en una comparacion
+        if ctx.getChild(1).getChildCount() == 0 and isinstance(ctx.parentCtx,compiladoresParser.InotContext):
+            super().visitOp(ctx.getChild(0))
+            return None
+        else: # esta en una comparacion
+            self.temporalesTerminales.append([])
+            super().visitOp(ctx.getChild(0))
+            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
+            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
+            self.temporalesTerminales.pop()
+            
+            if isinstance(ctx.parentCtx, compiladoresParser.CContext): # si esta en el segundo termino de una comparacion
+                return None
             self.visitC(ctx.getChild(1))
-        else:
-            self.isInComparacion = False
         return None
     
     def visitC(self, ctx:compiladoresParser.CContext):
-        """
-        Se visista la comparacio de manera recursiva, con la finalidad de calcular el segundo
-        termino de la misma.
-        Luego se procede a aplicar la comparacion de los dos terminos, esto con la finalidad de comparar terminos complejos
-        """
-        self.visitComp(ctx.getChild(1))
-        self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1][-2]} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1][-1]}")
-        self.temporalesTerminales[-1].append(self.temporales.getTop())
+        if ctx.getChildCount() > 0:
+            self.visitComp(ctx.getChild(1))
+            self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1][-2]} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1][-1]}")
+            self.temporalesTerminales[-1].append(self.temporales.getTop())
+            self.visitC(ctx.getChild(1).getChild(1))
         return None
     
     def visitIif(self, ctx:compiladoresParser.IifContext):
