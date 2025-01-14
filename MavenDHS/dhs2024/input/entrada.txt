@@ -1,3 +1,2 @@
-int x,i;
-for(i=0 ; x>0 ; x=x+1)
-	int x = 0;
+int w,x,y,z;
+int a = 1*w*x + 2 < 2*y*z  + 4< 3 + 3;
