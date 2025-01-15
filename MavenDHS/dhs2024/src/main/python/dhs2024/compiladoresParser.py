@@ -1,4 +1,4 @@
-# Generated from /home/antobadami/Documentos/proyectodhs/DHS/MavenDHS/dhs2024/src/main/python/dhs2024/compiladores.g4 by ANTLR 4.13.1
+# Generated from /home/ben/Documentos/DHS/MavenDHS/dhs2024/src/main/python/dhs2024/compiladores.g4 by ANTLR 4.13.1
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
@@ -65,25 +65,25 @@ def serializedATN():
         0,126,11,1,0,0,0,127,128,5,38,0,0,128,129,5,20,0,0,129,130,3,14,
         7,0,130,13,1,0,0,0,131,132,3,16,8,0,132,15,1,0,0,0,133,134,3,18,
         9,0,134,17,1,0,0,0,135,136,3,22,11,0,136,137,3,20,10,0,137,19,1,
-        0,0,0,138,139,5,17,0,0,139,140,3,18,9,0,140,141,3,20,10,0,141,144,
+        0,0,0,138,139,5,17,0,0,139,140,3,22,11,0,140,141,3,20,10,0,141,144,
         1,0,0,0,142,144,1,0,0,0,143,138,1,0,0,0,143,142,1,0,0,0,144,21,1,
         0,0,0,145,146,3,26,13,0,146,147,3,24,12,0,147,23,1,0,0,0,148,149,
-        5,16,0,0,149,150,3,22,11,0,150,151,3,24,12,0,151,154,1,0,0,0,152,
+        5,16,0,0,149,150,3,26,13,0,150,151,3,24,12,0,151,154,1,0,0,0,152,
         154,1,0,0,0,153,148,1,0,0,0,153,152,1,0,0,0,154,25,1,0,0,0,155,156,
         3,30,15,0,156,157,3,28,14,0,157,27,1,0,0,0,158,159,5,19,0,0,159,
-        160,3,26,13,0,160,161,3,28,14,0,161,168,1,0,0,0,162,163,5,18,0,0,
-        163,164,3,26,13,0,164,165,3,28,14,0,165,168,1,0,0,0,166,168,1,0,
+        160,3,30,15,0,160,161,3,28,14,0,161,168,1,0,0,0,162,163,5,18,0,0,
+        163,164,3,30,15,0,164,165,3,28,14,0,165,168,1,0,0,0,166,168,1,0,
         0,0,167,158,1,0,0,0,167,162,1,0,0,0,167,166,1,0,0,0,168,29,1,0,0,
         0,169,170,3,34,17,0,170,171,3,32,16,0,171,31,1,0,0,0,172,173,5,22,
-        0,0,173,174,3,30,15,0,174,175,3,32,16,0,175,190,1,0,0,0,176,177,
-        5,21,0,0,177,178,3,30,15,0,178,179,3,32,16,0,179,190,1,0,0,0,180,
-        181,5,24,0,0,181,182,3,30,15,0,182,183,3,32,16,0,183,190,1,0,0,0,
-        184,185,5,23,0,0,185,186,3,30,15,0,186,187,3,32,16,0,187,190,1,0,
+        0,0,173,174,3,34,17,0,174,175,3,32,16,0,175,190,1,0,0,0,176,177,
+        5,21,0,0,177,178,3,34,17,0,178,179,3,32,16,0,179,190,1,0,0,0,180,
+        181,5,24,0,0,181,182,3,34,17,0,182,183,3,32,16,0,183,190,1,0,0,0,
+        184,185,5,23,0,0,185,186,3,34,17,0,186,187,3,32,16,0,187,190,1,0,
         0,0,188,190,1,0,0,0,189,172,1,0,0,0,189,176,1,0,0,0,189,180,1,0,
         0,0,189,184,1,0,0,0,189,188,1,0,0,0,190,33,1,0,0,0,191,192,3,38,
         19,0,192,193,3,36,18,0,193,35,1,0,0,0,194,195,5,9,0,0,195,196,3,
-        34,17,0,196,197,3,36,18,0,197,204,1,0,0,0,198,199,5,10,0,0,199,200,
-        3,34,17,0,200,201,3,36,18,0,201,204,1,0,0,0,202,204,1,0,0,0,203,
+        38,19,0,196,197,3,36,18,0,197,204,1,0,0,0,198,199,5,10,0,0,199,200,
+        3,38,19,0,200,201,3,36,18,0,201,204,1,0,0,0,202,204,1,0,0,0,203,
         194,1,0,0,0,203,198,1,0,0,0,203,202,1,0,0,0,204,37,1,0,0,0,205,206,
         3,42,21,0,206,207,3,40,20,0,207,39,1,0,0,0,208,209,5,11,0,0,209,
         210,3,42,21,0,210,211,3,40,20,0,211,222,1,0,0,0,212,213,5,12,0,0,
@@ -964,8 +964,8 @@ class compiladoresParser ( Parser ):
         def OR(self):
             return self.getToken(compiladoresParser.OR, 0)
 
-        def lor(self):
-            return self.getTypedRuleContext(compiladoresParser.LorContext,0)
+        def land(self):
+            return self.getTypedRuleContext(compiladoresParser.LandContext,0)
 
 
         def a(self):
@@ -999,22 +999,22 @@ class compiladoresParser ( Parser ):
         try:
             self.state = 143
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,4,self._ctx)
-            if la_ == 1:
+            token = self._input.LA(1)
+            if token in [17]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 138
                 self.match(compiladoresParser.OR)
                 self.state = 139
-                self.lor()
+                self.land()
                 self.state = 140
                 self.a()
                 pass
-
-            elif la_ == 2:
+            elif token in [2, 5, 6]:
                 self.enterOuterAlt(localctx, 2)
 
                 pass
-
+            else:
+                raise NoViableAltException(self)
 
         except RecognitionException as re:
             localctx.exception = re
@@ -1089,8 +1089,8 @@ class compiladoresParser ( Parser ):
         def AND(self):
             return self.getToken(compiladoresParser.AND, 0)
 
-        def land(self):
-            return self.getTypedRuleContext(compiladoresParser.LandContext,0)
+        def inot(self):
+            return self.getTypedRuleContext(compiladoresParser.InotContext,0)
 
 
         def l(self):
@@ -1124,22 +1124,22 @@ class compiladoresParser ( Parser ):
         try:
             self.state = 153
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,5,self._ctx)
-            if la_ == 1:
+            token = self._input.LA(1)
+            if token in [16]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 148
                 self.match(compiladoresParser.AND)
                 self.state = 149
-                self.land()
+                self.inot()
                 self.state = 150
                 self.l()
                 pass
-
-            elif la_ == 2:
+            elif token in [2, 5, 6, 17]:
                 self.enterOuterAlt(localctx, 2)
 
                 pass
-
+            else:
+                raise NoViableAltException(self)
 
         except RecognitionException as re:
             localctx.exception = re
@@ -1214,8 +1214,8 @@ class compiladoresParser ( Parser ):
         def NOT(self):
             return self.getToken(compiladoresParser.NOT, 0)
 
-        def inot(self):
-            return self.getTypedRuleContext(compiladoresParser.InotContext,0)
+        def comp(self):
+            return self.getTypedRuleContext(compiladoresParser.CompContext,0)
 
 
         def n(self):
@@ -1252,32 +1252,31 @@ class compiladoresParser ( Parser ):
         try:
             self.state = 167
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,6,self._ctx)
-            if la_ == 1:
+            token = self._input.LA(1)
+            if token in [19]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 158
                 self.match(compiladoresParser.NOT)
                 self.state = 159
-                self.inot()
+                self.comp()
                 self.state = 160
                 self.n()
                 pass
-
-            elif la_ == 2:
+            elif token in [18]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 162
                 self.match(compiladoresParser.IGUAL)
                 self.state = 163
-                self.inot()
+                self.comp()
                 self.state = 164
                 self.n()
                 pass
-
-            elif la_ == 3:
+            elif token in [2, 5, 6, 16, 17]:
                 self.enterOuterAlt(localctx, 3)
 
                 pass
-
+            else:
+                raise NoViableAltException(self)
 
         except RecognitionException as re:
             localctx.exception = re
@@ -1352,8 +1351,8 @@ class compiladoresParser ( Parser ):
         def MAYOR(self):
             return self.getToken(compiladoresParser.MAYOR, 0)
 
-        def comp(self):
-            return self.getTypedRuleContext(compiladoresParser.CompContext,0)
+        def op(self):
+            return self.getTypedRuleContext(compiladoresParser.OpContext,0)
 
 
         def c(self):
@@ -1396,52 +1395,49 @@ class compiladoresParser ( Parser ):
         try:
             self.state = 189
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,7,self._ctx)
-            if la_ == 1:
+            token = self._input.LA(1)
+            if token in [22]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 172
                 self.match(compiladoresParser.MAYOR)
                 self.state = 173
-                self.comp()
+                self.op()
                 self.state = 174
                 self.c()
                 pass
-
-            elif la_ == 2:
+            elif token in [21]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 176
                 self.match(compiladoresParser.MENOR)
                 self.state = 177
-                self.comp()
+                self.op()
                 self.state = 178
                 self.c()
                 pass
-
-            elif la_ == 3:
+            elif token in [24]:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 180
                 self.match(compiladoresParser.MAI)
                 self.state = 181
-                self.comp()
+                self.op()
                 self.state = 182
                 self.c()
                 pass
-
-            elif la_ == 4:
+            elif token in [23]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 184
                 self.match(compiladoresParser.MEI)
                 self.state = 185
-                self.comp()
+                self.op()
                 self.state = 186
                 self.c()
                 pass
-
-            elif la_ == 5:
+            elif token in [2, 5, 6, 16, 17, 18, 19]:
                 self.enterOuterAlt(localctx, 5)
 
                 pass
-
+            else:
+                raise NoViableAltException(self)
 
         except RecognitionException as re:
             localctx.exception = re
@@ -1516,8 +1512,8 @@ class compiladoresParser ( Parser ):
         def SUMA(self):
             return self.getToken(compiladoresParser.SUMA, 0)
 
-        def op(self):
-            return self.getTypedRuleContext(compiladoresParser.OpContext,0)
+        def term(self):
+            return self.getTypedRuleContext(compiladoresParser.TermContext,0)
 
 
         def e(self):
@@ -1554,32 +1550,31 @@ class compiladoresParser ( Parser ):
         try:
             self.state = 203
             self._errHandler.sync(self)
-            la_ = self._interp.adaptivePredict(self._input,8,self._ctx)
-            if la_ == 1:
+            token = self._input.LA(1)
+            if token in [9]:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 194
                 self.match(compiladoresParser.SUMA)
                 self.state = 195
-                self.op()
+                self.term()
                 self.state = 196
                 self.e()
                 pass
-
-            elif la_ == 2:
+            elif token in [10]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 198
                 self.match(compiladoresParser.RESTA)
                 self.state = 199
-                self.op()
+                self.term()
                 self.state = 200
                 self.e()
                 pass
-
-            elif la_ == 3:
+            elif token in [2, 5, 6, 16, 17, 18, 19, 21, 22, 23, 24]:
                 self.enterOuterAlt(localctx, 3)
 
                 pass
-
+            else:
+                raise NoViableAltException(self)
 
         except RecognitionException as re:
             localctx.exception = re
