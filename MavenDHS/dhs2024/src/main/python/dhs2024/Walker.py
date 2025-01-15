@@ -147,6 +147,85 @@ class Walker (compiladoresVisitor):
             self.visitC(ctx.getChild(1).getChild(1))
         return None
     
+    
+    def visitInot(self, ctx:compiladoresParser.InotContext):
+        # no esta en una comparacion
+        if ctx.getChild(1).getChildCount() == 0 and isinstance(ctx.parentCtx,compiladoresParser.LandContext):
+            self.visitComp(ctx.getChild(0))
+            return None
+        else: # esta en una comparacion
+            self.temporalesTerminales.append([])
+            self.visitComp(ctx.getChild(0))
+            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
+            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
+            self.temporalesTerminales.pop()
+            
+            if isinstance(ctx.parentCtx, compiladoresParser.NContext): # si esta en el segundo termino de una comparacion
+                return None
+            self.visitN(ctx.getChild(1))
+        return None
+
+
+    def visitN(self, ctx:compiladoresParser.NContext):
+        if ctx.getChildCount() > 0:
+            self.visitInot(ctx.getChild(1))
+            self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1][-2]} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1][-1]}")
+            self.temporalesTerminales[-1].append(self.temporales.getTop())
+            self.visitN(ctx.getChild(1).getChild(1))
+        return None
+    
+    def visitLand(self, ctx:compiladoresParser.LandContext):
+        # no esta en una comparacion
+        if ctx.getChild(1).getChildCount() == 0 and isinstance(ctx.parentCtx,compiladoresParser.LorContext):
+            self.visitInot(ctx.getChild(0))
+            return None
+        else: # esta en una comparacion
+            self.temporalesTerminales.append([])
+            self.visitInot(ctx.getChild(0))
+            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
+            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
+            self.temporalesTerminales.pop()
+            
+            if isinstance(ctx.parentCtx, compiladoresParser.LContext): # si esta en el segundo termino de una comparacion
+                return None
+            self.visitL(ctx.getChild(1))
+        return None
+    
+    def visitL(self, ctx:compiladoresParser.LContext):
+        if ctx.getChildCount() > 0:
+            self.visitLand(ctx.getChild(1))
+            self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1][-2]} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1][-1]}")
+            self.temporalesTerminales[-1].append(self.temporales.getTop())
+            self.visitL(ctx.getChild(1).getChild(1))
+        return None
+    
+    def visitLor(self, ctx:compiladoresParser.LorContext):
+        # no esta en una comparacion
+        if ctx.getChild(1).getChildCount() == 0 and isinstance(ctx.parentCtx,compiladoresParser.ExpContext):
+            self.visitLand(ctx.getChild(0))
+            return None
+        else: # esta en una comparacion
+            self.temporalesTerminales.append([])
+            self.visitLand(ctx.getChild(0))
+            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
+            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
+            self.temporalesTerminales.pop()
+            
+            if isinstance(ctx.parentCtx, compiladoresParser.AContext): # si esta en el segundo termino de una comparacion
+                return None
+            self.visitA(ctx.getChild(1))
+        return None
+
+
+    # Visit a parse tree produced by compiladoresParser#a.
+    def visitA(self, ctx:compiladoresParser.AContext):
+        if ctx.getChildCount() > 0:
+            self.visitLor(ctx.getChild(1))
+            self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1][-2]} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1][-1]}")
+            self.temporalesTerminales[-1].append(self.temporales.getTop())
+            self.visitA(ctx.getChild(1).getChild(1))
+        return None
+
     def visitIif(self, ctx:compiladoresParser.IifContext):
         ielse = False
         if ctx.getChildCount() == 6:
