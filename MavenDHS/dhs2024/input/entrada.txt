@@ -1,1 +1,16 @@
-int x = a+b;
+int main () {
+    int x;
+    int x = 0;
+    int a, b, c;
+    int a = 0, b = 0, c = 0;
+
+    while (y > 0) {
+        int x = 0;
+        y = y - 1;
+        {
+            int x = 0;
+        }
+    }
+
+    return 0;
+}

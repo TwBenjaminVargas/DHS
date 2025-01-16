@@ -442,9 +442,10 @@ class Escucha (compiladoresListener):
     # Exit a parse tree produced by compiladoresParser#argumento.
     # Por el momento solo acepta variables como argumentos
     def exitArgumento(self, ctx:compiladoresParser.ArgumentoContext):
-         # verifico el tipo del opal argumento y lo añado a la lista de argumentos
-         self.currentArgsLists.append(self.verificarTipoOpal(self.compatibilityTypeList.pop()))
-         # recordar que estan siendo acomodados de atras para adelante
+        if ctx.getChildCount() > 0:
+            # verifico el tipo del opal argumento y lo añado a la lista de argumentos
+            self.currentArgsLists.append(self.verificarTipoOpal(self.compatibilityTypeList.pop()))
+            # recordar que estan siendo acomodados de atras para adelante
                 
     def verificarTipoOpal(self, listaTipos):
         """Verifica en una lista de tipos cual es el tipo de dato predominante o si hay tipos combinados

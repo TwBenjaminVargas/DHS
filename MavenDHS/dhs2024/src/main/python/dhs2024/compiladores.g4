@@ -108,30 +108,30 @@ asignacion: ID ASIG opal
 
 opal : exp ; //completar
 
-//exp : lor a ;
+//exp : lor a ; 
 exp : lor ;
 
 lor: land a ;
-a : OR lor a
+a : OR land a
   |
   ;
 
 land : inot l ;
-l : AND land l
+l : AND inot l
   |
   ;
 
 inot : comp n ;
-n : NOT inot n
-  | IGUAL inot n
+n : NOT comp n
+  | IGUAL comp n
   |
   ;
 
 comp : op c ;
-c : MAYOR comp c
-  | MENOR comp c
-  | MAI comp c
-  | MEI comp c
+c : MAYOR op c
+  | MENOR op c
+  | MAI op c
+  | MEI op c
   |
   ;
 /*c : (MAYOR | MENOR | MAI | MEI) comp  // Comparadores
@@ -140,8 +140,8 @@ c : MAYOR comp c
 
 op : term e ;
 
-e : SUMA op e
-  | RESTA op e
+e : SUMA term e
+  | RESTA term e
 //  | op e
   |
   ; 
