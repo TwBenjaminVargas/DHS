@@ -28,7 +28,6 @@ class Walker (compiladoresVisitor):
         #print(self.temporalesTerminales)
         self.codigoIntermedio.addLine(f"{ctx.getChild(0).getText()} = {self.temporalesTerminales[-1][-1]}")
         # Limpiamos la pila de temporales terminales para la siguiente operacion
-        print(self.temporalesTerminales)
         self.temporalesTerminales = []
     
     """def visitTerm(self, ctx:compiladoresParser.TermContext):
@@ -121,30 +120,32 @@ class Walker (compiladoresVisitor):
         return None"""
         
     def visitFactor(self, ctx:compiladoresParser.FactorContext):
-        if isinstance(ctx.getChild(0),TerminalNode):
-            if ctx.getChild(0).getSymbol().type == compiladoresParser.ID:
-                self.temporalesTerminales[-1].append(ctx.getChild(0).getText())
+        if ctx.getChildCount() > 1: #Parentesis
+            self.visitExp(ctx.getChild(1))
+                
+        elif isinstance(ctx.getChild(0),TerminalNode):
+            #if ctx.getChild(0).getSymbol().type == compiladoresParser.ID:
+                #self.temporalesTerminales[-1].append(ctx.getChild(0).getText())
+            self.temporalesTerminales[-1].append(ctx.getChild(0).getText())
         else:
             if isinstance(ctx.getChild(0),compiladoresParser.IllamadaContext): # llamada a funcion
                 self.visitIllamada(ctx.getChild(0))
-            elif ctx.getChild(0).getChildCount() > 1: #Parentesis
-                self.visitExp(ctx.getChild(0).getChild(1))
         return None
     
     def visitTerm(self, ctx:compiladoresParser.TermContext):
         if ctx.getChild(1).getChildCount() == 0 and isinstance(ctx.parentCtx,compiladoresParser.OpContext):
             self.visitFactor(ctx.getChild(0))
             return None
-        else: # esta en una suma
+        else: # esta en una multiplicacion
             self.temporalesTerminales.append([])
             self.visitFactor(ctx.getChild(0))
-            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
-            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
-            self.temporalesTerminales.pop()
             
             if isinstance(ctx.parentCtx, compiladoresParser.TContext): # si esta en el segundo termino de una suma
                 return None
             self.visitT(ctx.getChild(1))
+            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
+            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
+            self.temporalesTerminales.pop()
         return None
 
 
@@ -164,13 +165,13 @@ class Walker (compiladoresVisitor):
         else: # esta en una suma
             self.temporalesTerminales.append([])
             self.visitTerm(ctx.getChild(0))
-            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
-            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
-            self.temporalesTerminales.pop()
             
             if isinstance(ctx.parentCtx, compiladoresParser.EContext): # si esta en el segundo termino de una suma
                 return None
             self.visitE(ctx.getChild(1))
+            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
+            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
+            self.temporalesTerminales.pop()
         return None
 
 
@@ -190,13 +191,13 @@ class Walker (compiladoresVisitor):
         else: # esta en una comparacion
             self.temporalesTerminales.append([])
             self.visitOp(ctx.getChild(0))
-            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
-            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
-            self.temporalesTerminales.pop()
             
             if isinstance(ctx.parentCtx, compiladoresParser.CContext): # si esta en el segundo termino de una comparacion
                 return None
             self.visitC(ctx.getChild(1))
+            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
+            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
+            self.temporalesTerminales.pop()
         return None
     
     def visitC(self, ctx:compiladoresParser.CContext):
@@ -216,13 +217,13 @@ class Walker (compiladoresVisitor):
         else: # esta en una comparacion
             self.temporalesTerminales.append([])
             self.visitComp(ctx.getChild(0))
-            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
-            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
-            self.temporalesTerminales.pop()
             
             if isinstance(ctx.parentCtx, compiladoresParser.NContext): # si esta en el segundo termino de una comparacion
                 return None
             self.visitN(ctx.getChild(1))
+            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
+            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
+            self.temporalesTerminales.pop()
         return None
 
 
@@ -242,13 +243,13 @@ class Walker (compiladoresVisitor):
         else: # esta en una comparacion
             self.temporalesTerminales.append([])
             self.visitInot(ctx.getChild(0))
-            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
-            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
-            self.temporalesTerminales.pop()
             
             if isinstance(ctx.parentCtx, compiladoresParser.LContext): # si esta en el segundo termino de una comparacion
                 return None
             self.visitL(ctx.getChild(1))
+            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
+            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
+            self.temporalesTerminales.pop()
         return None
     
     def visitL(self, ctx:compiladoresParser.LContext):
@@ -267,13 +268,13 @@ class Walker (compiladoresVisitor):
         else: # esta en una comparacion
             self.temporalesTerminales.append([])
             self.visitLand(ctx.getChild(0))
-            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
-            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
-            self.temporalesTerminales.pop()
             
             if isinstance(ctx.parentCtx, compiladoresParser.AContext): # si esta en el segundo termino de una comparacion
                 return None
             self.visitA(ctx.getChild(1))
+            # Respaldamos el ultimo valor y borramos la ultima lista en la pila
+            self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
+            self.temporalesTerminales.pop()
         return None
 
 
@@ -348,9 +349,16 @@ class Walker (compiladoresVisitor):
         self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
         return None
     
+    def visitIprototipo(self, ctx:compiladoresParser.IprototipoContext):
+        self.etiquetaFuncion[ctx.getChild(1).getText()] = self.etiqueta.generateLabel() 
+        return None
+    
     def visitIfuncion(self, ctx:compiladoresParser.IfuncionContext):
-        self.codigoIntermedio.addLine(f"label {self.etiqueta.generateLabel()}")
-        self.etiquetaFuncion[ctx.getChild(1).getText()] = self.etiqueta.getLabel()
+        if ctx.getChild(1).getText() in self.etiquetaFuncion: #habia prototipo
+            self.codigoIntermedio.addLine(f"label {self.etiquetaFuncion[ctx.getChild(1).getText()]}")
+        else:
+            self.codigoIntermedio.addLine(f"label {self.etiqueta.generateLabel()}")
+            self.etiquetaFuncion[ctx.getChild(1).getText()] = self.etiqueta.getLabel()
         self.codigoIntermedio.addLine(f"pop {self.temporales.generateTemp()}")
         jmppos = self.temporales.getTop()
         self.visitParam(ctx.getChild(3))
