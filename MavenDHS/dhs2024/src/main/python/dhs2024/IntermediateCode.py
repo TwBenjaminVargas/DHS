@@ -19,6 +19,12 @@ class IntermediateCode():
             Retorna el contenido actual del archivo
         """
         return self.cod
+    
+    def closeCode(self):
+        """
+            Cierra el archivo de codigo
+        """
+        self.file.close()
         
     def __del__(self):
         """

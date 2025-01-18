@@ -13,6 +13,7 @@ from compiladoresLexer  import compiladoresLexer
 from compiladoresParser import compiladoresParser
 from Escucha import Escucha # de esta forma se trae especificamente la clase
 from Walker import Walker
+from OptCode import OptCode
 def main(argv):
     archivo = "input/entrada.txt"
     if len(argv) > 1 :
@@ -27,6 +28,8 @@ def main(argv):
     #print(tree.toStringTree(recog=parser))
     caminante = Walker()
     caminante.visitPrograma(tree)
-
+    caminante.finish()
+    optimizador = OptCode("src/main/python/dhs2024/out/cod.txt","src/main/python/dhs2024/out/optcod.txt")
+    optimizador.optimizar()
 if __name__ == '__main__':
     main(sys.argv)

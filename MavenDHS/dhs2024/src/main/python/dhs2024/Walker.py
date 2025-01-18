@@ -405,3 +405,6 @@ class Walker (compiladoresVisitor):
             if ctx.getChildCount() > 1:
                 self.visitArgumento(ctx.getChild(2))
         return None
+    
+    def finish(self):
+        self.codigoIntermedio.closeCode()
