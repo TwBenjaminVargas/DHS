@@ -1,4 +1,4 @@
-t0 = 1.0 == 1
+t0 = True
 ifnjmp t0, l0
 a = 0
 label l0

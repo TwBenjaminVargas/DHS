@@ -6,8 +6,8 @@ from Etiqueta import Etiqueta
 from antlr4 import *
 class Walker (compiladoresVisitor):
     
-    def __init__(self):
-        self.codigoIntermedio = IntermediateCode("src/main/python/dhs2024/out/cod.txt")
+    def __init__(self,salida: str):
+        self.codigoIntermedio = IntermediateCode(salida)
         self.temporales = Temporales()
         self.etiqueta = Etiqueta()
         self.etiquetaList = list()

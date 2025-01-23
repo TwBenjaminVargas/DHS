@@ -171,8 +171,7 @@ factor : NUMERO
 
 iwhile  :  WHILE PA cond PC instruccion ;
 
-cond  : opal
-      | factor;
+cond  : opal;
 
 bloque  :  LLA instrucciones LLC; 
 

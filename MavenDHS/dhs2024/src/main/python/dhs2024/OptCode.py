@@ -2,54 +2,101 @@
  Clase dedicada a la optmimizacion de codigo intermedio
 """
 class OptCode():
-    
-    def __init__(self,inroute, outroute):
+       
+    def optimizar(self,inroute,outroute):
         self.infile = open(inroute, "r")
-        self.outfile = open(outroute,"w+")
-        
-    def optimizar(self):
+        self.outfile = open("auxfile.txt","w+")
         self.eliminarAccionesRepetidas()
+        self.infile.close()
+        self.outfile.close()
+        self.infile = open("auxfile.txt", "r")
+        self.outfile = open(outroute,"w+")
+        self.propagacionDeConstantes()
+        self.infile.close()
+        self.outfile.close()
+        
+    def propagacionDeConstantes(self):
+        valores = dict()
+        for line in self.infile:
+            linevector = line.split()
+            if linevector[1] == "=": #asignaciones
+                sustituido = False
+                if len(linevector) == 3 and self.isNumericValue(linevector[-1]):
+                        valores[linevector[0]] = linevector[2]
+                        if not self.isTerminal(linevector):
+                            continue
+                elif len(linevector) > 3 and self.isNumericValue(linevector[2]) and self.isNumericValue(linevector[4]):
+                    resul = eval(" ".join(linevector[2:]))
+                    del linevector[2:]
+                    linevector.append(str(resul))                    
+                else:
+                    for i in range(2,len(linevector)): #recorrer asignacion y cambiar valores
+                        if linevector[i] in valores:
+                            linevector[i] =valores[linevector[i]]
+                     
+                            
+            self.outfile.write(" ".join(linevector) + "\n")
             
+    def isNumericValue(self,val: str):
+        val = val.replace('.','',1) #eliminamos punto si es un decimal
+        return val.isdigit()
+        
     def eliminarAccionesRepetidas(self):
         acciones = dict()
         sustitutos = dict()
-        sustituido  = False
-        # lectura del archivo
+        
         for line in self.infile:
-            linelist = line.split()
-            #FILTROS
-            # descartamos asignaciones (mejorar filtros)
-            if len(linelist) > 3:
-                #obtener accion
-                accion = " ".join(linelist[2:])
-                sustituido = False
-                
-                #verificamos si hay valores sustituibles
-                for val in [linelist[2],linelist[-1]]:
-                    # si hay sustituir
-                    if val in sustitutos:
-                        val = sustitutos[val]
-                        sustituido = True
-                
-                if sustituido:
-                    # escribe linea a la que se le aplica sustitucion
-                    self.outfile.write(" ".join(linelist))
-                    print("Sustucion en: " + " ".join(linelist))
+            linevector = line.split()
+            if linevector[0] == "ifnjmp":
+                #quitamos "," del ifnjmp
+                linevector[1] = linevector[1][:-1]
+            
+            
+            sustituido = False
+            for i in range(1,len(linevector)):
+                if linevector[i] in sustitutos:
+                    linevector[i] = sustitutos[linevector[i]]
+                    sustituido = True
                     
-                else:
-                    #si la accion ya esta registrada 
-                    if accion in acciones:
-                        #añadir a sustitutos y descartar linea
-                        sustitutos[linelist[0]] = acciones[accion]
-                    else:
-                    # asociar acciones a valor
-                        acciones[accion] = linelist[0]
-            else:
-                self.outfile.write(line)
-        print(acciones)
-        print(sustitutos)
-        return None 
+                    
+            if linevector[1] == "=": # asignacion
+                accion = " ".join(linevector[2:])
+                variable = linevector[0]
+                if self.isTerminal(linevector):
+                    # en caso de actualizacion del valor de una variable debemos "limpiar diccionario de acciones 
+                    # que la contenian asi evitamos que se sigan usando
+                    #terminales.add(linevector[0])
+                    self.limpiarDiccionario(acciones,variable)
+                elif not sustituido:    
+                            if accion in acciones:
+                                sustitutos[variable] = acciones[accion]
+                                continue
+                            else:
+                                acciones[accion] = variable
+                
+            if linevector[0] == "ifnjmp":
+                #devolvemos el "," del ifnjmp
+                linevector[1] += ","
+                    
+            self.outfile.write(" ".join(linevector) + "\n")
     
+    def limpiarDiccionario(self, diccionario : dict, valor):
+        diccionario_copy = diccionario.copy()
+        for accion in diccionario_copy:
+            if valor in accion:
+                #print(f" salio {diccionario.pop(accion)} con la accion {accion}")
+                diccionario.pop(accion)
+         
+         
+    def isTerminal(self, line):
+        """
+            Determina si una linea es del tipo terminal por ejemplo a = t0
+        """
+        variable = line[0]
+        if len(variable) == 2 and ( variable[0] == "t" and variable[1:].isdigit()):
+            return False
+        return True
+   
     def __del__(self):
         """
             Destructor de la clase
