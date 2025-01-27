@@ -174,7 +174,6 @@ class Escucha (compiladoresListener):
         print("FIN COMPILACION".center(TAM))
         print("=" * TAM)
         print("")
-        
         self.printHistoricoContextos()
 
 
@@ -363,7 +362,10 @@ class Escucha (compiladoresListener):
         self.compatibilityTypeList.append([])
         
     def exitCond(self, ctx:compiladoresParser.CondContext):
-        self.compatibilityTypeList.pop()
+        condlist = self.verificarTipoOpal(self.compatibilityTypeList.pop())
+        #aca se deberia verificar si hay incompatibilodad de tipos
+        print(condlist)
+        self.validarCompatibilidadTipos(condlist[0],condlist)
     
     # Enter a parse tree produced by compiladoresParser#ireturn.
     def enterIreturn(self, ctx:compiladoresParser.IreturnContext):
@@ -446,6 +448,8 @@ class Escucha (compiladoresListener):
             # verifico el tipo del opal argumento y lo añado a la lista de argumentos
             self.currentArgsLists.append(self.verificarTipoOpal(self.compatibilityTypeList.pop()))
             # recordar que estan siendo acomodados de atras para adelante
+        else:
+            self.compatibilityTypeList.pop()
                 
     def verificarTipoOpal(self, listaTipos):
         """Verifica en una lista de tipos cual es el tipo de dato predominante o si hay tipos combinados
