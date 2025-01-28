@@ -18,7 +18,7 @@ def main(argv):
     archivo = "input/entrada.txt"
     salida = "src/main/python/dhs2024/out/cod.txt"
     optroute = "src/main/python/dhs2024/out/optcod1.txt"
-    pasadas = 8
+    pasadas = 1
     
     if len(argv) > 1 :
         archivo = argv[1]

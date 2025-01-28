@@ -19,22 +19,36 @@ class OptCode():
         valores = dict()
         for line in self.infile:
             linevector = line.split()
-            if linevector[1] == "=": #asignaciones
-                sustituido = False
+            
+            if linevector[0] == "ifnjmp":
+                #quitamos "," del ifnjmp
+                linevector[1] = linevector[1][:-1]
+                
+            sustituido = False
+            for i in range(1,len(linevector)): #recorrer asignacion y cambiar valores
+                if linevector[i] in valores:
+                    linevector[i] =valores[linevector[i]]
+                    sustituido = True
+            
+            if linevector[1] == "=" and not sustituido: #asignaciones
                 if len(linevector) == 3 and self.isNumericValue(linevector[-1]):
                         valores[linevector[0]] = linevector[2]
                         if not self.isTerminal(linevector):
                             continue
                 elif len(linevector) > 3 and self.isNumericValue(linevector[2]) and self.isNumericValue(linevector[4]):
                     resul = eval(" ".join(linevector[2:]))
+                    if type(resul) == bool:
+                        if resul:
+                            resul = 1
+                        else:
+                            resul = 0
                     del linevector[2:]
-                    linevector.append(str(resul))                    
-                else:
-                    for i in range(2,len(linevector)): #recorrer asignacion y cambiar valores
-                        if linevector[i] in valores:
-                            linevector[i] =valores[linevector[i]]
-                     
-                            
+                    linevector.append(str(resul))                            
+            
+            if linevector[0] == "ifnjmp":
+                #devolvemos el "," del ifnjmp
+                linevector[1] += ","
+            
             self.outfile.write(" ".join(linevector) + "\n")
             
     def isNumericValue(self,val: str):

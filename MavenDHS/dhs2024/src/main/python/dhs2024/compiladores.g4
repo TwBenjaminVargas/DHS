@@ -88,8 +88,6 @@ instruccion: declaracion PYC
 
 
 //declaracion: ;
-//Evaluar idea
-// int x,y,w,z=2;
 declaracion : tipo ID dec
             | tipo asignacion dec
             ;
