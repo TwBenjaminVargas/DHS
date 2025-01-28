@@ -1,2 +1,6 @@
-int a = 2, b= 4, c= 6, d = 8;
-int x =(a*b - c) + (a*b +d);
+int x = 1;
+x = x + 1;
+for (;;)
+{
+    x = x + 1;
+}

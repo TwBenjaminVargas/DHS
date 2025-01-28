@@ -1,10 +1,7 @@
-a = 2
-b = 4
-c = 6
-d = 8
-t0 = a * b
-t1 = t0 - c
-t2 = a * b
-t3 = t2 + d
-t4 = t1 + t3
-x = t4
+x = 1
+t0 = x + 1
+x = t0
+label l0
+t1 = x + 1
+x = t1
+jmp l0

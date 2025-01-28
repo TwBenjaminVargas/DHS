@@ -51,27 +51,48 @@ class Escucha (compiladoresListener):
                 print("Intento retornar FLOAT cuando se espera CHAR".center(TAM))
                 print("-"*TAM)
                 
-    def validarCompatibilidadTipos(self,tipodato,list):
+    def validarCompatibilidadTipos(self,list: list, tipodato = None):
         """
             Verifica la control list con el tipo esperado, si no son compatibles emite
             mensaje de error y retorna False
         """
-        if tipodato == 'INT':
-            if 'FLOAT' in list:
-                print("")
-                print("-"*TAM)
-                print("ERROR SEMANTICO:".center(TAM))
-                print("Intento asignar FLOAT a INT".center(TAM))
-                print("-"*TAM)
-                return False
-        if tipodato == 'CHAR':
-            if 'FLOAT' in list:
-                print("")
-                print("-"*TAM)
-                print("ERROR SEMANTICO:".center(TAM))
-                print("Intento asignar FLOAT a CHAR".center(TAM))
-                print("-"*TAM)
-                return False
+        if tipodato:
+            if tipodato == 'INT':
+                if 'FLOAT' in list:
+                    print("")
+                    print("-"*TAM)
+                    print("ERROR SEMANTICO:".center(TAM))
+                    print("Intento asignar FLOAT a INT".center(TAM))
+                    print("-"*TAM)
+                    return False
+            if tipodato == 'CHAR':
+                if 'FLOAT' in list:
+                    print("")
+                    print("-"*TAM)
+                    print("ERROR SEMANTICO:".center(TAM))
+                    print("Intento asignar FLOAT a CHAR".center(TAM))
+                    print("-"*TAM)
+                    return False
+        else:
+            tipo = list[0]
+            if len(list) > 1:
+                if tipo == 'INT' or tipo == 'FLOAT':
+                    if 'FLOAT' in list[1:] or 'INT' in list[1:]:
+                        print("")
+                        print("-"*TAM)
+                        print("ERROR SEMANTICO:".center(TAM))
+                        print("Intento comparar INT y FLOAT".center(TAM))
+                        print("-"*TAM)
+                        return False
+                if tipo == 'CHAR':
+                    if 'FLOAT' in list:
+                        print("")
+                        print("-"*TAM)
+                        print("ERROR SEMANTICO:".center(TAM))
+                        print("Intento comparar FLOAT y CHAR".center(TAM))
+                        print("-"*TAM)
+                        return False
+                
         return True
                 
     def verificarIDInicializado(self,idstr):
@@ -220,7 +241,7 @@ class Escucha (compiladoresListener):
         
         # valida asignacion y establece inicializada
         if myvar:
-            self.validarCompatibilidadTipos(myvar.tipoDato,self.compatibilityTypeList[-1])
+            self.validarCompatibilidadTipos(self.compatibilityTypeList[-1], myvar.tipoDato)
             myvar.inicializado = True
         self.inAsignacion = False
         
@@ -364,8 +385,8 @@ class Escucha (compiladoresListener):
     def exitCond(self, ctx:compiladoresParser.CondContext):
         condlist = self.verificarTipoOpal(self.compatibilityTypeList.pop())
         #aca se deberia verificar si hay incompatibilodad de tipos
-        print(condlist)
-        self.validarCompatibilidadTipos(condlist[0],condlist)
+        #print(condlist)
+        self.validarCompatibilidadTipos(condlist)
     
     # Enter a parse tree produced by compiladoresParser#ireturn.
     def enterIreturn(self, ctx:compiladoresParser.IreturnContext):
@@ -415,7 +436,7 @@ class Escucha (compiladoresListener):
                     print("-"*TAM)
                 else:
                     for i , arg in enumerate(myfunc.args):
-                        if not self.validarCompatibilidadTipos(arg.tipoDato,self.currentArgsLists[i]):
+                        if not self.validarCompatibilidadTipos(self.currentArgsLists[i],arg.tipoDato):
                             print("")
                             print("-"*TAM)
                             print("ERROR SEMANTICO:".center(TAM))
