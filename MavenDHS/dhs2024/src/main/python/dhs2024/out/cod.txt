@@ -1,7 +1,0 @@
-x = 1
-t0 = x + 1
-x = t0
-label l0
-t1 = x + 1
-x = t1
-jmp l0

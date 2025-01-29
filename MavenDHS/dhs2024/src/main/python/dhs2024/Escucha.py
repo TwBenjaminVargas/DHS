@@ -16,10 +16,12 @@ class Escucha (compiladoresListener):
             
         #pila de control de tipos
         self.compatibilityTypeList = list()
+        
+        #correspondencia en funciones
         self.currentParamLists = list()
         self.currentArgsLists = list()
-        self.currentDeclarationList = list()
         self.currentPrototipeLists = list()
+        
         #stack para tipos usados
         self.vartypeStack = list()
         
@@ -29,29 +31,35 @@ class Escucha (compiladoresListener):
         self.inAsignacion = False
         self.itsReturns = False 
         self.inDeclaration = False
+        self.errorcount = 0
+        
+    def isAnyError(self):
+        if self.errorcount > 0:
+            return True
+        return False
+    
+    def printError(self, ctx, msj:str):
+        print(f"Error semantico en linea {ctx.start.line}: {msj}")
+        self.errorcount += 1
+        
+    def printAdvertencia(self, ctx, msj:str):
+        print(f"Advertencia en linea {ctx.start.line}:{msj}")
         
     # Errores y advertencias
-    def verificarTiposRetorno(self,tipoFuncion):
+    
+    def verificarTiposRetorno(self,tipoFuncion,ctx):
         """
             Verifica compatibilidad con los tipos retornados, en caso de incompatibilidad
             imprime error
         """
         if tipoFuncion == 'INT':
             if 'FLOAT' in self.compatibilityTypeList[-1]:
-                print("")
-                print("-"*TAM)
-                print("ERROR SEMANTICO:".center(TAM))
-                print("Intento retonar FLOAT cuando se espera INT".center(TAM))
-                print("-"*TAM)
+                self.printError(ctx,"Intento retonar FLOAT cuando se espera INT")
         if tipoFuncion == 'CHAR':
             if 'FLOAT' in self.compatibilityTypeList[-1]:
-                print("")
-                print("-"*TAM)
-                print("ERROR SEMANTICO:".center(TAM))
-                print("Intento retornar FLOAT cuando se espera CHAR".center(TAM))
-                print("-"*TAM)
+                self.printError(ctx,"Intento retornar FLOAT cuando se espera CHAR")
                 
-    def validarCompatibilidadTipos(self,list: list, tipodato = None):
+    def validarCompatibilidadTipos(self,list: list,ctx, tipodato = None):
         """
             Verifica la control list con el tipo esperado, si no son compatibles emite
             mensaje de error y retorna False
@@ -59,95 +67,67 @@ class Escucha (compiladoresListener):
         if tipodato:
             if tipodato == 'INT':
                 if 'FLOAT' in list:
-                    print("")
-                    print("-"*TAM)
-                    print("ERROR SEMANTICO:".center(TAM))
-                    print("Intento asignar FLOAT a INT".center(TAM))
-                    print("-"*TAM)
+                    self.printError(ctx,"Intento asignar FLOAT a INT")
                     return False
             if tipodato == 'CHAR':
                 if 'FLOAT' in list:
-                    print("")
-                    print("-"*TAM)
-                    print("ERROR SEMANTICO:".center(TAM))
-                    print("Intento asignar FLOAT a CHAR".center(TAM))
-                    print("-"*TAM)
+                    self.printError(ctx,"Intento asignar FLOAT a CHAR")
                     return False
         else:
             tipo = list[0]
             if len(list) > 1:
                 if tipo == 'INT' or tipo == 'FLOAT':
                     if 'FLOAT' in list[1:] or 'INT' in list[1:]:
-                        print("")
-                        print("-"*TAM)
-                        print("ERROR SEMANTICO:".center(TAM))
-                        print("Intento comparar INT y FLOAT".center(TAM))
-                        print("-"*TAM)
+                        self.printError(ctx,"Intento comparar INT y FLOAT")
                         return False
                 if tipo == 'CHAR':
                     if 'FLOAT' in list:
-                        print("")
-                        print("-"*TAM)
-                        print("ERROR SEMANTICO:".center(TAM))
-                        print("Intento comparar FLOAT y CHAR".center(TAM))
-                        print("-"*TAM)
+                        self.printError(ctx,"Intento comparar CHAR y FLOAT")
                         return False
                 
         return True
                 
-    def verificarIDInicializado(self,idstr):
+    def verificarIDInicializado(self,idstr,ctx):
         """
             Verifica si un ID esta inicializado, y lo añade a la lista de control de tipos actual
         """
         myvar = self.tabla.buscarGlobal(idstr)
         if myvar:
             if not myvar.inicializado:
-                print("")
-                print("-"*TAM)
-                print("ERROR SEMANTICO:".center(TAM))
-                print("Identificador \"{}\" no inicializado".format(idstr).center(TAM))
-                print("-"*TAM)
+                self.printError(ctx,"Identificador \"{}\" no inicializado".format(idstr))
             myvar.usado = True
             self.compatibilityTypeList[-1].append(myvar.tipoDato)
             
         else:
-            print("")
-            print("-"*TAM)
-            print("ERROR SEMANTICO:".center(TAM))
-            print("Identificador \"{}\" no definido".format(idstr).center(TAM))
-            print("-"*TAM)
+            self.printError(ctx,"Identificador \"{}\" no definido".format(idstr))
             return None
         
-    def nombreIdentificadorRepetido(self,id):
+    def nombreIdentificadorRepetido(self,id,ctx):
         """
             Verifica si un identificador esta repetido en el contexto actual
         """
         if not self.tabla.buscarLocal(id.nombre):
             return False
         else:
-            print("")
-            print("-"*TAM)
-            print("ERROR SEMANTICO:".center(TAM))
-            print(f"Nombre de identificado repetido \"{id.nombre}\"".center(TAM))
-            print("-"*TAM)
+            self.printError(ctx,f"Nombre de identificado repetido \"{id.nombre}\"")
             return True
       
     def enterBloque(self, ctx:compiladoresParser.BloqueContext):
         self.tabla.addContexto()
         if self.inFuncion:
-            self.parametrosAContexto()
+            self.parametrosAContexto(ctx)
 
     def exitBloque(self, ctx:compiladoresParser.BloqueContext):
-        self.verificarUsoIDs()
+        self.verificarUsoIDs(ctx)
         self.tabla.delContexto()
         
-    def parametrosAContexto(self):
+    def parametrosAContexto(self,ctx):
         """
             Agrega parametros a el contexto actual en caso de estar dentro
             de una funcion
         """
         for param in self.currentParamLists:
-            if not self.nombreIdentificadorRepetido(param):
+            if not self.nombreIdentificadorRepetido(param,ctx):
                 self.tabla.addIdentificador(param)
                 
     def printHistoricoContextos(self):
@@ -163,7 +143,7 @@ class Escucha (compiladoresListener):
         
 
     #OPT
-    def verificarUsoIDs(self):
+    def verificarUsoIDs(self,ctx):
         """
             Busca los identificadores creados en el contexto actual
             y verifica que se haga uso de ellos, de lo contrario
@@ -172,11 +152,7 @@ class Escucha (compiladoresListener):
         for idstr in self.tabla.contextos[-1].tabla:
             myvar = self.tabla.contextos[-1].tabla[idstr]
             if not myvar.usado:
-                print("")
-                print("-"*TAM)
-                print("ADVERTENCIA:".center(TAM))
-                print("Identificador \"{}\" no utilizado".format(myvar.nombre).center(80))
-                print("-"*TAM)
+                self.printAdvertencia(ctx,"Identificador \"{}\" no utilizado".format(myvar.nombre))
          
     def enterPrograma(self, ctx:compiladoresParser.ProgramaContext):
         print("=" * TAM)
@@ -187,7 +163,7 @@ class Escucha (compiladoresListener):
         self.tabla.addContexto()
         
     def exitPrograma(self, ctx:compiladoresParser.ProgramaContext):
-        self.verificarUsoIDs()
+        self.verificarUsoIDs(ctx)
         
         #Borramos contexto global
         self.tabla.delContexto()
@@ -208,17 +184,16 @@ class Escucha (compiladoresListener):
         id = ctx.getToken(compiladoresParser.ID, 0)
         if id:
             myvar = Variable(self.vartypeStack[-1],ctx.getChild(1).getText())
-            if not self.nombreIdentificadorRepetido(myvar):
+            if not self.nombreIdentificadorRepetido(myvar,ctx):
                 self.tabla.addIdentificador(myvar)
         
         self.inDeclaration = False
-        self.currentDeclarationList = []
         
     def exitDec(self, ctx:compiladoresParser.DecContext):
         id = ctx.getToken(compiladoresParser.ID, 0)
         if id:
             myvar = Variable(self.vartypeStack[-1],id.getText())
-            if not self.nombreIdentificadorRepetido(myvar):
+            if not self.nombreIdentificadorRepetido(myvar,ctx):
                 self.tabla.addIdentificador(myvar)
             
     def exitTipo(self, ctx:compiladoresParser.TipoContext):
@@ -234,14 +209,14 @@ class Escucha (compiladoresListener):
         myvar = None
         if self.inDeclaration:
             myvar = Variable(self.vartypeStack[-1],ctx.getChild(0).getText())
-            if not self.nombreIdentificadorRepetido(myvar):
+            if not self.nombreIdentificadorRepetido(myvar,ctx):
                 self.tabla.addIdentificador(myvar)
         else:
-            myvar = self.obtenerIdentificadorDeclarado(ctx.getChild(0).getText())
+            myvar = self.obtenerIdentificadorDeclarado(ctx.getChild(0).getText(),ctx)
         
         # valida asignacion y establece inicializada
         if myvar:
-            self.validarCompatibilidadTipos(self.compatibilityTypeList[-1], myvar.tipoDato)
+            self.validarCompatibilidadTipos(self.compatibilityTypeList[-1],ctx, myvar.tipoDato)
             myvar.inicializado = True
         self.inAsignacion = False
         
@@ -249,7 +224,7 @@ class Escucha (compiladoresListener):
         self.compatibilityTypeList.pop()
     
       
-    def obtenerIdentificadorDeclarado(self,idstr):
+    def obtenerIdentificadorDeclarado(self,idstr,ctx):
         """
             Busca un identificador declarado, de no encotrarse imprime un error
         """
@@ -257,12 +232,9 @@ class Escucha (compiladoresListener):
         if myvar:
             return myvar
         else:
-            print("")
-            print("-"*TAM)
-            print("ERROR SEMANTICO:".center(TAM))
-            print(f"Identificador \"{idstr}\" no declarado".center(TAM))
-            print("-"*TAM)
+            self.printError(ctx,f"Identificador \"{idstr}\" no declarado")
             return None
+        
     def añadirTipoAListaControl(self,ctx:compiladoresParser.FactorContext):
         """
             Añade a la lista de control un tipo segun su token
@@ -279,7 +251,7 @@ class Escucha (compiladoresListener):
         self.añadirTipoAListaControl(ctx)
         id = ctx.getToken(compiladoresParser.ID, 0)
         if id:
-            self.verificarIDInicializado(id.getText())
+            self.verificarIDInicializado(id.getText(),ctx)
         
             
 
@@ -295,7 +267,7 @@ class Escucha (compiladoresListener):
         
         #Si existe el identificador
         if myprototipo:
-            self.validarCorrespondeciaConPrototipo(myprototipo,tipoFuncion)
+            self.validarCorrespondeciaConPrototipo(myprototipo,tipoFuncion,ctx)
             myprototipo.inicializado = True
         else: #La creamos   
             myFuncion = Funcion(idFuncion,tipoFuncion,True,False,self.currentParamLists)
@@ -303,21 +275,17 @@ class Escucha (compiladoresListener):
             self.currentParamLists = []
             #verificar compatibilidad con los datos retornados
             if not self.itsReturns and tipoFuncion != 'VOID':
-                print("")
-                print("-"*TAM)
-                print("ERROR SEMANTICO:".center(TAM))
-                print(f"Se espera un valor de retorno {tipoFuncion} y no se proporciono ningun retorno".center(TAM))
-                print("-"*TAM)
+                self.printError(ctx,f"Se espera un valor de retorno {tipoFuncion} y no se proporciono ningun retorno")
                 
         if self.itsReturns:
-            self.verificarTiposRetorno(tipoFuncion)
+            self.verificarTiposRetorno(tipoFuncion ,ctx)
             # quitamos la lista de retorno
             self.compatibilityTypeList.pop()
             self.itsReturns = False
         
         self.inFuncion = False
 
-    def validarCorrespondeciaConPrototipo(self, myprototipo : Funcion, tipostr):
+    def validarCorrespondeciaConPrototipo(self, myprototipo : Funcion, tipostr,ctx):
         """
             verifica que una funcion cumple con su prototipo o si se repitio un identificador
         """
@@ -327,23 +295,11 @@ class Escucha (compiladoresListener):
             if len(myprototipo.args) == len(self.currentParamLists):
                 for i,protoparam in enumerate(myprototipo.args):
                     if protoparam.tipoDato != self.currentParamLists[i].tipoDato:
-                        print("")
-                        print("-"*TAM)
-                        print("ERROR SEMANTICO:".center(TAM))
-                        print(f"Los tipos de datos no coinciden con los del prototipo\nse esperaba {protoparam.tipoDato} y se dio {self.currentParamLists[i].tipoDato}".center(TAM))
-                        print("-"*TAM)      
+                        self.printError(ctx,f"Los tipos de datos no coinciden con los del prototipo\nse esperaba {protoparam.tipoDato} y se dio {self.currentParamLists[i].tipoDato}")      
             else:
-                print("")
-                print("-"*TAM)
-                print("ERROR SEMANTICO:".center(TAM))
-                print(f"Cantidad de argumentos no coincide con el prototipo\n se esperaban {len(myprototipo.args)} y se dieron {len(self.currentParamLists)}".center(TAM))
-                print("-"*TAM)        
+                self.printError(ctx,f"Cantidad de argumentos no coincide con el prototipo\n se esperaban {len(myprototipo.args)} y se dieron {len(self.currentParamLists)}")
         else:
-            print("")
-            print("-"*TAM)
-            print("ERROR SEMANTICO:".center(TAM))
-            print(f"Tipo de dato de retorno no coincide con el esperado : {protoparam.tipoDato}".center(TAM))
-            print("-"*TAM)
+            self.printError(ctx,f"Tipo de dato de retorno no coincide con el esperado : {protoparam.tipoDato}")
                   
 
     # Enter a parse tree produced by compiladoresParser#param.
@@ -362,7 +318,9 @@ class Escucha (compiladoresListener):
         tipoFuncion = ctx.getChild(0).getText().upper()
         idFuncion = ctx.getChild(1).getText()
         myFuncion = Funcion(idFuncion,tipoFuncion,False,False,self.currentPrototipeLists)
-        if not self.nombreIdentificadorRepetido(myFuncion):
+        if not self.nombreIdentificadorRepetido(myFuncion,ctx):
+            #confiamos en que el usuario la inicializara
+            myFuncion.inicializado = True
             self.tabla.addIdentificador(myFuncion)
 
     def exitProtoparam(self, ctx:compiladoresParser.ProtoparamContext):
@@ -386,17 +344,13 @@ class Escucha (compiladoresListener):
         condlist = self.verificarTipoOpal(self.compatibilityTypeList.pop())
         #aca se deberia verificar si hay incompatibilodad de tipos
         #print(condlist)
-        self.validarCompatibilidadTipos(condlist)
+        self.validarCompatibilidadTipos(condlist,ctx)
     
     # Enter a parse tree produced by compiladoresParser#ireturn.
     def enterIreturn(self, ctx:compiladoresParser.IreturnContext):
         self.compatibilityTypeList.append([])
         if not self.inFuncion :
-            print("")
-            print("-"*TAM)
-            print("ERROR SEMANTICO:".center(TAM))
-            print("Utilizacion de un return sin funcion".center(TAM))
-            print("-"*TAM)
+            self.printError(ctx,"Utilizacion de un return sin funcion")
         self.itsReturns = True
     
     # Exit a parse tree produced by compiladoresParser#ireturn.
@@ -412,11 +366,8 @@ class Escucha (compiladoresListener):
         if myfunc :
             # si encuetra el identificador pero es una variable
             if isinstance(myfunc, Variable):
-                print("")
-                print("-"*TAM)
-                print("ERROR SEMANTICO:".center(TAM))
-                print(f"{myfunc.nombre} no es una funcion".center(TAM))
-                print("-"*TAM)
+                #OJO ACA
+                self.printError(ctx,f"{myfunc.nombre} no es una funcion")
             if myfunc.inicializado:
                 #print(myfunc)
                 if self.inAsignacion:
@@ -429,32 +380,16 @@ class Escucha (compiladoresListener):
                 self.currentArgsLists.reverse()
                 
                 if len(myfunc.args) != len(self.currentArgsLists):
-                    print("")
-                    print("-"*TAM)
-                    print("ERROR SEMANTICO:".center(TAM))
-                    print(f"Cantidad de argumentos incompatibles en la llamada a {myfunc.nombre}".center(TAM))
-                    print("-"*TAM)
+                    self.printError(ctx,f"Cantidad de argumentos incompatibles en la llamada a {myfunc.nombre}")
                 else:
                     for i , arg in enumerate(myfunc.args):
-                        if not self.validarCompatibilidadTipos(self.currentArgsLists[i],arg.tipoDato):
-                            print("")
-                            print("-"*TAM)
-                            print("ERROR SEMANTICO:".center(TAM))
-                            print(f"Tipo de argumento incompatible, se espera {arg.tipoDato} y se dio {self.currentArgsLists[i]}".center(TAM))
-                            print("-"*TAM)
+                        if not self.validarCompatibilidadTipos(self.currentArgsLists[i],ctx,arg.tipoDato):
+                            self.printError(ctx,f"Tipo de argumento incompatible, se espera {arg.tipoDato} y se dio {self.currentArgsLists[i]}")
                 self.currentArgsLists = []
             else:
-                print("")
-                print("-"*TAM)
-                print("ERROR SEMANTICO:".center(TAM))
-                print(f"funcion {id.getText()} no inicializada".center(TAM))
-                print("-"*TAM) 
-        else: 
-            print("")
-            print("-"*TAM)
-            print("ERROR SEMANTICO:".center(TAM))
-            print(f"funcion {id.getText()} no declarada".center(TAM))
-            print("-"*TAM)
+                self.printError(ctx,f"funcion {id.getText()} no inicializada")
+        else:
+            self.printError(ctx,f"funcion {id.getText()} no declarada")
 
     
     def enterArgumento(self, ctx:compiladoresParser.ArgumentoContext):
@@ -482,15 +417,3 @@ class Escucha (compiladoresListener):
                 tlist.append(tipo)
         tlist.append(t)
         return tlist
-    
-    def visitTerminal(self, node: TerminalNode):
-        #print("-----> Token: " + node.getText())
-        self.numTokens +=1
-    
-    def visitErrorNode(self, node: ErrorNode):
-        print("-"*TAM)
-        print(f"ERROR SINTACTICO: Linea <{node.getSymbol().line}>".center(TAM))
-        print("-"*TAM)
-    
-    def enterEveryRule(self, ctx):
-        self.numNodos += 1
