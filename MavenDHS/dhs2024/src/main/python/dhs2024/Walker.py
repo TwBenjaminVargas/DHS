@@ -30,52 +30,6 @@ class Walker (compiladoresVisitor):
         # Limpiamos la pila de temporales terminales para la siguiente operacion
         self.temporalesTerminales = []
     
-    """def visitTerm(self, ctx:compiladoresParser.TermContext):
-        
-        # primer termino llamada a funcion
-        if ctx.getChild(0).getChild(0).getChildCount() == 4:
-            self.visitIllamada(ctx.getChild(0).getChild(0))
-            if ctx.getChild(1).getChildCount() > 0:
-                self.visitT(ctx.getChild(1))
-                self.temporalesTerminales[-1].append(self.temporales.getTop())
-            self.isSimpleTerm = False
-            return None
-            
-        # primer termino contiene parentesis           
-        if ctx.getChild(0).getChildCount() > 1:
-            super().visitFactor(ctx.getChild(0))
-            self.isSimpleTerm = False
-            # Si el termino en parentesis es la primera parte de un producto/division
-            if ctx.getChild(1).getChildCount() > 0:
-                # Limpiamos el temporal del termino con parentesis ya que no lo queremos guardar
-                self.temporalesTerminales[-1].pop()
-                self.visitT(ctx.getChild(1))
-                self.temporalesTerminales[-1].append(self.temporales.getTop())
-            return None
-        
-        # tratamiento de segundo termino
-        if ctx.getChild(1).getChildCount() == 0:
-            self.isSimpleTerm = True
-        else:
-            self.isSimpleTerm = False
-        
-        if self.isSimpleTerm and len(self.temporalesTerminales[-1]) == 0:
-            self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getText()}")
-        # Inicia  calculo de producto
-        elif not self.isSimpleTerm:
-            if ctx.getChild(1).getChild(1).getChildCount() == 3:# segundo termino del producto/division es un parentesis
-                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getChild(0).getText()}")
-                self.visitT(ctx.getChild(1))
-            elif isinstance(ctx.getChild(1).getChild(1).getChild(0),compiladoresParser.IllamadaContext): # segundo es una llamada
-                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getChild(0).getText()}")
-                self.visitT(ctx.getChild(1))
-            else: #segundo termino es simple
-                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {ctx.getChild(0).getText()} {ctx.getChild(1).getChild(0).getText()} {ctx.getChild(1).getChild(1).getText()}")
-                self.visitT(ctx.getChild(1).getChild(2))
-        self.temporalesTerminales[-1].append(self.temporales.getTop())
-        #print(f"Añadi el {self.temporalesTerminales[-1][-1]}")
-        return None"""
-    
     def visitExp(self, ctx:compiladoresParser.ExpContext):
         self.temporalesTerminales.append([])
         super().visitExp(ctx)
@@ -84,40 +38,6 @@ class Walker (compiladoresVisitor):
             self.temporalesTerminales[-2].append(self.temporalesTerminales[-1].pop())
             self.temporalesTerminales.pop()
         return None
-    
-    """def visitE(self, ctx:compiladoresParser.EContext):
-        if ctx.getChildCount() > 0:
-            self.visitTerm(ctx.getChild(1).getChild(0))
-            op = ""
-            if self.isSimpleTerm:
-                op =f"{self.temporalesTerminales[-1][-1]} {ctx.getChild(0).getText()} {ctx.getChild(1).getChild(0).getText()}"
-            else:
-                op =f"{self.temporalesTerminales[-1][-2]} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1][-1]}"
-            
-            self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {op}")
-            self.temporalesTerminales[-1].append(self.temporales.getTop())
-            self.visitE(ctx.getChild(1).getChild(1))
-        return None"""
-    
-    
-    """def visitT(self, ctx:compiladoresParser.TContext):
-        if ctx.getChildCount() > 0:
-            if ctx.getChild(1).getChildCount() > 1: # encontramos termino con parentesis en el camino
-                # metemos el temporal anterior dentro de los terminales
-                self.temporalesTerminales[-1].append(self.temporales.getTop())
-                self.visitExp(ctx.getChild(1).getChild(1))
-                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1].pop(-2)} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1].pop()}")
-                self.visitT(ctx.getChild(2))
-            elif isinstance(ctx.getChild(1).getChild(0), compiladoresParser.IllamadaContext): #hay una llamada
-                self.temporalesTerminales[-1].append(self.temporales.getTop())
-                self.visitIllamada(ctx.getChild(1).getChild(0))
-                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {self.temporalesTerminales[-1].pop(-2)} {ctx.getChild(0).getText()} {self.temporalesTerminales[-1].pop()}")
-                self.visitT(ctx.getChild(2))
-            else:
-                op = f"{self.temporales.getTop()} {ctx.getChild(0).getText()} {ctx.getChild(1).getText()}"
-                self.codigoIntermedio.addLine(f"{self.temporales.generateTemp()} = {op}")
-                self.visitT(ctx.getChild(2))
-        return None"""
         
     def visitFactor(self, ctx:compiladoresParser.FactorContext):
         if ctx.getChildCount() > 1: #Parentesis
@@ -395,7 +315,7 @@ class Walker (compiladoresVisitor):
         return None
     
     def visitArgumento(self, ctx:compiladoresParser.ArgumentoContext):
-        # va a haber problemas cuando quieras mandar una valriable sola
+
         if ctx.getChildCount() > 0:
             self.temporalesTerminales.append([])
             super().visitOpal(ctx.getChild(0))

@@ -14,6 +14,8 @@ from compiladoresParser import compiladoresParser
 from Escucha import Escucha # de esta forma se trae especificamente la clase
 from Walker import Walker
 from OptCode import OptCode
+from ErrorEscucha import ErrorEscucha
+
 def main(argv):
     archivo = "input/entrada.txt"
     salida = "src/main/python/dhs2024/out/cod.txt"
@@ -22,17 +24,31 @@ def main(argv):
     
     if len(argv) > 1 :
         archivo = argv[1]
+
     input = FileStream(archivo)
     lexer = compiladoresLexer(input)
     stream = CommonTokenStream(lexer)
     parser = compiladoresParser(stream)
+    
     escucha = Escucha()
     parser.addParseListener(escucha)
+    
+    # Remover el listener de errores por defecto y agregar el personalizado
+    error = ErrorEscucha()
+    parser.removeErrorListeners()
+    parser.addErrorListener(error)
+    
+    
     tree = parser.programa()
+    
+    if escucha.isAnyError():
+        sys.exit()
+        
     #print(tree.toStringTree(recog=parser))
     caminante = Walker(salida)
     caminante.visitPrograma(tree)
     caminante.finish()
+    
     optimizador = OptCode()
     for i in range(pasadas):
         optimizador.optimizar(salida,optroute)
