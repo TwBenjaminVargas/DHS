@@ -16,7 +16,7 @@ class Walker (compiladoresVisitor):
         self.isSimpleTerm = False
         
     def visitPrograma(self,ctx : compiladoresParser.ProgramaContext):
-        print("Inicia generacion de codigo intermedio...")
+        #print("Inicia generacion de codigo intermedio...")
         return super().visitPrograma(ctx)
     
     def visitInstruccion(self, ctx:compiladoresParser.InstruccionContext):
@@ -209,6 +209,7 @@ class Walker (compiladoresVisitor):
 
     def visitIif(self, ctx:compiladoresParser.IifContext):
         ielse = False
+        self.codigoIntermedio.separateBlock()
         if ctx.getChildCount() == 6:
             ielse = True
         super().visitCond(ctx.getChild(2))
@@ -224,6 +225,7 @@ class Walker (compiladoresVisitor):
         self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
         if ielse:
             self.visitIelse(ctx.getChild(5)) 
+        self.codigoIntermedio.separateBlock()
         return None
     
     def visitIelse(self, ctx:compiladoresParser.IelseContext):
@@ -232,10 +234,11 @@ class Walker (compiladoresVisitor):
         return None
     
     def visitIfor(self, ctx:compiladoresParser.IforContext):
+        self.codigoIntermedio.separateBlock()
         # lista de iniciacion
         if ctx.getChild(2).getChildCount() > 0:
             super().visitInit(ctx.getChild(2))
-        self.codigoIntermedio.addLine(f"label {self.etiqueta.generateLabel()}")
+        self.codigoIntermedio.addLine(f"label b{self.etiqueta.generateLabel()}")
         self.etiquetaList.append(self.etiqueta.getLabel())
         # lista de condicion
         if ctx.getChild(4).getChildCount() > 0:
@@ -250,13 +253,15 @@ class Walker (compiladoresVisitor):
         # lista de iteracion
         if ctx.getChild(6).getChildCount() > 0:
             super().visitIter(ctx.getChild(6))
-        self.codigoIntermedio.addLine(f"jmp {self.etiquetaList.pop()}")
+        self.codigoIntermedio.addLine(f"jmp b{self.etiquetaList.pop()}")
         if ctx.getChild(4).getChildCount() > 0:
             self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
+        self.codigoIntermedio.separateBlock()
         return None
     
     def visitIwhile(self, ctx:compiladoresParser.IwhileContext):
-        self.codigoIntermedio.addLine(f"label {self.etiqueta.generateLabel()}")
+        self.codigoIntermedio.separateBlock()
+        self.codigoIntermedio.addLine(f"label b{self.etiqueta.generateLabel()}")
         self.etiquetaList.append(self.etiqueta.getLabel())
         super().visitCond(ctx.getChild(2))
         self.codigoIntermedio.addLine(f"ifnjmp {self.temporalesTerminales[-1][-1]}, {self.etiqueta.generateLabel()}")
@@ -265,8 +270,9 @@ class Walker (compiladoresVisitor):
         self.etiquetaList[-1],self.etiquetaList[-2] = self.etiquetaList[-2], self.etiquetaList[-1]
         # cuerpo del while
         super().visitInstruccion(ctx.getChild(4))
-        self.codigoIntermedio.addLine(f"jmp {self.etiquetaList.pop()}")
+        self.codigoIntermedio.addLine(f"jmp b{self.etiquetaList.pop()}")
         self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
+        self.codigoIntermedio.separateBlock()
         return None
     
     def visitIprototipo(self, ctx:compiladoresParser.IprototipoContext):
@@ -274,6 +280,7 @@ class Walker (compiladoresVisitor):
         return None
     
     def visitIfuncion(self, ctx:compiladoresParser.IfuncionContext):
+        self.codigoIntermedio.separateBlock()
         if ctx.getChild(1).getText() in self.etiquetaFuncion: #habia prototipo
             self.codigoIntermedio.addLine(f"label {self.etiquetaFuncion[ctx.getChild(1).getText()]}")
         else:
@@ -284,6 +291,7 @@ class Walker (compiladoresVisitor):
         self.visitParam(ctx.getChild(3))
         super().visitInstruccion(ctx.getChild(5))
         self.codigoIntermedio.addLine(f"jmp {jmppos}")
+        self.codigoIntermedio.separateBlock()
         return None
     
     def visitParam(self, ctx:compiladoresParser.ParamContext):
@@ -304,6 +312,7 @@ class Walker (compiladoresVisitor):
     
     def visitIllamada(self, ctx:compiladoresParser.IllamadaContext):
         #argumentos
+        self.codigoIntermedio.separateBlock()
         self.visitArgumento(ctx.getChild(2))
         self.codigoIntermedio.addLine(f"push {self.etiqueta.generateLabel()}")
         lblrtn = self.etiqueta.getLabel()
@@ -312,6 +321,7 @@ class Walker (compiladoresVisitor):
         if isinstance (ctx.parentCtx,compiladoresParser.FactorContext):
             self.codigoIntermedio.addLine(f"pop {self.temporales.generateTemp()}")
             self.temporalesTerminales[-1].append(self.temporales.getTop())
+        self.codigoIntermedio.separateBlock()
         return None
     
     def visitArgumento(self, ctx:compiladoresParser.ArgumentoContext):

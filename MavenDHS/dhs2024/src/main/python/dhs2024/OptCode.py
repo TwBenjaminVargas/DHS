@@ -17,39 +17,54 @@ class OptCode():
         
     def propagacionDeConstantes(self):
         valores = dict()
+        blockedLabel = []
         for line in self.infile:
             linevector = line.split()
-            
-            if linevector[0] == "ifnjmp":
-                #quitamos "," del ifnjmp
-                linevector[1] = linevector[1][:-1]
-                
-            sustituido = False
-            for i in range(1,len(linevector)): #recorrer asignacion y cambiar valores
-                if linevector[i] in valores:
-                    linevector[i] =valores[linevector[i]]
-                    sustituido = True
-            
-            if linevector[1] == "=" and not sustituido: #asignaciones
-                if len(linevector) == 3 and self.isNumericValue(linevector[-1]):
-                        valores[linevector[0]] = linevector[2]
-                        if not self.isTerminal(linevector):
-                            continue
-                elif len(linevector) > 3 and self.isNumericValue(linevector[2]) and self.isNumericValue(linevector[4]):
-                    resul = eval(" ".join(linevector[2:]))
-                    if type(resul) == bool:
-                        if resul:
-                            resul = 1
-                        else:
-                            resul = 0
-                    del linevector[2:]
-                    linevector.append(str(resul))                            
-            
-            if linevector[0] == "ifnjmp":
-                #devolvemos el "," del ifnjmp
-                linevector[1] += ","
+            if len(linevector) > 0:
+                if linevector[0] == "ifnjmp":
+                    #quitamos "," del ifnjmp
+                    linevector[1] = linevector[1][:-1]
+                if self.optimizacionAutorizada(linevector,blockedLabel):
+                    sustituido = False
+                    for i in range(1,len(linevector)): #recorrer asignacion y cambiar valores
+                        if linevector[i] in valores:
+                            linevector[i] =valores[linevector[i]]
+                            sustituido = True
+    
+                    if linevector[1] == "=" and not sustituido: #asignaciones
+                        if len(linevector) == 3 and self.isNumericValue(linevector[-1]):
+                                valores[linevector[0]] = linevector[2]
+                                if not self.isTerminal(linevector):
+                                    continue
+                        elif len(linevector) > 3 and self.isNumericValue(linevector[2]) and self.isNumericValue(linevector[4]):
+                            resul = eval(" ".join(linevector[2:]))
+                            if type(resul) == bool:
+                                if resul:
+                                    resul = 1
+                                else:
+                                    resul = 0
+                            del linevector[2:]
+                            linevector.append(str(resul))                            
+    
+                if linevector[0] == "ifnjmp":
+                    #devolvemos el "," del ifnjmp
+                    linevector[1] += ","
             
             self.outfile.write(" ".join(linevector) + "\n")
+    
+    def optimizacionAutorizada(self, linevector,blockedLabel : str):
+        if not blockedLabel:
+            if linevector[0] == "label" and linevector[1][0] == "b":
+                blockedLabel.append(linevector[1])
+                return False
+            return True
+        else:
+            if linevector[0] == "jmp" and linevector[1] == blockedLabel[0]:
+                #desbloqueamos
+                blockedLabel.pop()
+                return True
+            return False
+        
             
     def isNumericValue(self,val: str):
         val = val.replace('.','',1) #eliminamos punto si es un decimal
@@ -58,39 +73,39 @@ class OptCode():
     def eliminarAccionesRepetidas(self):
         acciones = dict()
         sustitutos = dict()
-        
+        blockedLabel = []
         for line in self.infile:
             linevector = line.split()
-            if linevector[0] == "ifnjmp":
-                #quitamos "," del ifnjmp
-                linevector[1] = linevector[1][:-1]
-            
-            
-            sustituido = False
-            for i in range(1,len(linevector)):
-                if linevector[i] in sustitutos:
-                    linevector[i] = sustitutos[linevector[i]]
-                    sustituido = True
-                    
-                    
-            if linevector[1] == "=": # asignacion
-                accion = " ".join(linevector[2:])
-                variable = linevector[0]
-                if self.isTerminal(linevector):
-                    # en caso de actualizacion del valor de una variable debemos "limpiar diccionario de acciones 
-                    # que la contenian asi evitamos que se sigan usando
-                    #terminales.add(linevector[0])
-                    self.limpiarDiccionario(acciones,variable)
-                elif not sustituido:    
-                            if accion in acciones:
-                                sustitutos[variable] = acciones[accion]
-                                continue
-                            else:
-                                acciones[accion] = variable
-                
-            if linevector[0] == "ifnjmp":
-                #devolvemos el "," del ifnjmp
-                linevector[1] += ","
+            if len(linevector) > 0:
+                if linevector[0] == "ifnjmp":
+                    #quitamos "," del ifnjmp
+                    linevector[1] = linevector[1][:-1]
+                if self.optimizacionAutorizada(linevector,blockedLabel):
+                    sustituido = False
+                    for i in range(1,len(linevector)):
+                        if linevector[i] in sustitutos:
+                            linevector[i] = sustitutos[linevector[i]]
+                            sustituido = True
+
+
+                    if linevector[1] == "=": # asignacion
+                        accion = " ".join(linevector[2:])
+                        variable = linevector[0]
+                        if self.isTerminal(linevector):
+                            # en caso de actualizacion del valor de una variable debemos "limpiar diccionario de acciones 
+                            # que la contenian asi evitamos que se sigan usando
+                            #terminales.add(linevector[0])
+                            self.limpiarDiccionario(acciones,variable)
+                        elif not sustituido:    
+                                    if accion in acciones:
+                                        sustitutos[variable] = acciones[accion]
+                                        continue
+                                    else:
+                                        acciones[accion] = variable
+
+                if linevector[0] == "ifnjmp":
+                    #devolvemos el "," del ifnjmp
+                    linevector[1] += ","
                     
             self.outfile.write(" ".join(linevector) + "\n")
     
@@ -100,8 +115,7 @@ class OptCode():
             if valor in accion:
                 #print(f" salio {diccionario.pop(accion)} con la accion {accion}")
                 diccionario.pop(accion)
-         
-         
+    
     def isTerminal(self, line):
         """
             Determina si una linea es del tipo terminal por ejemplo a = t0
