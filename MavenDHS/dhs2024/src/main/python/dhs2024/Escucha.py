@@ -39,11 +39,11 @@ class Escucha (compiladoresListener):
         return False
     
     def printError(self, ctx, msj:str):
-        print(f"Error semantico en linea {ctx.start.line}: {msj}")
+        print("- " + f"\033[31mError semantico en linea {ctx.start.line}: {msj}\033[0m")
         self.errorcount += 1
         
     def printAdvertencia(self, ctx, msj:str):
-        print(f"Advertencia en linea {ctx.start.line}:{msj}")
+        print("- " + f"\033[33mAdvertencia en linea {ctx.start.line}: {msj}\033[0m")
         
     # Errores y advertencias
     
@@ -164,6 +164,15 @@ class Escucha (compiladoresListener):
         
     def exitPrograma(self, ctx:compiladoresParser.ProgramaContext):
         self.verificarUsoIDs(ctx)
+        
+        for idstr in self.tabla.contextos[-1].tabla:
+            id = self.tabla.contextos[-1].tabla[idstr]
+            if not id.inicializado:
+                if isinstance(id,Funcion):
+                    self.printError(ctx,f"funcion {id.nombre} no declarada")
+                else:
+                    self.printAdvertencia(ctx,"Identificador \"{}\" no inicializado".format(id.nombre))
+                
         
         #Borramos contexto global
         self.tabla.delContexto()
@@ -320,7 +329,6 @@ class Escucha (compiladoresListener):
         myFuncion = Funcion(idFuncion,tipoFuncion,False,False,self.currentPrototipeLists)
         if not self.nombreIdentificadorRepetido(myFuncion,ctx):
             #confiamos en que el usuario la inicializara
-            myFuncion.inicializado = True
             self.tabla.addIdentificador(myFuncion)
 
     def exitProtoparam(self, ctx:compiladoresParser.ProtoparamContext):
@@ -368,7 +376,7 @@ class Escucha (compiladoresListener):
             if isinstance(myfunc, Variable):
                 #OJO ACA
                 self.printError(ctx,f"{myfunc.nombre} no es una funcion")
-            if myfunc.inicializado:
+            else:
                 #print(myfunc)
                 if self.inAsignacion:
                     self.compatibilityTypeList[-1].append(myfunc.tipoDato) #añadimos a la lista de control de tipos
@@ -386,10 +394,9 @@ class Escucha (compiladoresListener):
                         if not self.validarCompatibilidadTipos(self.currentArgsLists[i],ctx,arg.tipoDato):
                             self.printError(ctx,f"Tipo de argumento incompatible, se espera {arg.tipoDato} y se dio {self.currentArgsLists[i]}")
                 self.currentArgsLists = []
-            else:
-                self.printError(ctx,f"funcion {id.getText()} no inicializada")
+                
         else:
-            self.printError(ctx,f"funcion {id.getText()} no declarada")
+            self.printError(ctx,f"funcion {id.getText()} no existente")
 
     
     def enterArgumento(self, ctx:compiladoresParser.ArgumentoContext):
@@ -406,7 +413,7 @@ class Escucha (compiladoresListener):
             # recordar que estan siendo acomodados de atras para adelante
         else:
             self.compatibilityTypeList.pop()
-                
+            
     def verificarTipoOpal(self, listaTipos):
         """Verifica en una lista de tipos cual es el tipo de dato predominante o si hay tipos combinados
         Retorna una lista con el tipo o los tipos del opal"""

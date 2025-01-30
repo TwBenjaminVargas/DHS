@@ -13,6 +13,11 @@ class IntermediateCode():
         """
         self.cod += line + "\n"
         self.file.write(line + "\n")
+        
+    def separateBlock(self):
+        if not self.cod.endswith("\n\n") and not self.file.tell() == 0:
+            self.cod +="\n"
+            self.file.write("\n")
     
     def showCodeStatus(self):
         """
