@@ -17,12 +17,3 @@ class ErrorEscucha (ErrorListener):
         
         print(err)
         sys.exit()
-        
-#mismatched input ';' expecting {'(', NUMERO, DECIMAL, CARACTER, ID}
-
-#extraneous input '}' expecting <EOF>
-
-
-#missing '}' at '<EOF>'
-
-#no viable alternative at input 'intfint'

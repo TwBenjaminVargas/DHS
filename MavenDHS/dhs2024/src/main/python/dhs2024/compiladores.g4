@@ -101,12 +101,10 @@ tipo  : (INT | VOID | FLOAT | CHAR);
 
 // corregir para permitir la combinacion de los mismos
 asignacion: ID ASIG opal
-//          | ID ASIG illamada
           ;
 
-opal : exp ; //completar
+opal : exp ; 
 
-//exp : lor a ; 
 exp : lor ;
 
 lor: land a ;
@@ -132,31 +130,21 @@ c : MAYOR op c
   | MEI op c
   |
   ;
-/*c : (MAYOR | MENOR | MAI | MEI) comp  // Comparadores
-  |                                   // Regla vacía permitiendo finalizar sin comparador
-  ;*/
 
 op : term e ;
 
 e : SUMA term e
   | RESTA term e
-//  | op e
   |
   ; 
-/*e : (SUMA | RESTA) op 
-  |                  // Regla vacía permitiendo finalizar sin SUMA o RESTA
-  ;
-*/
+
 term : factor t ;
 t : MULT factor t 
   | DIV factor t
   | MOD factor t
   |
   ;
-/*t : (MULT | DIV | MOD) factor 
-  |                       // Regla vacía permitiendo finalizar sin operador
-  ;
-*/
+
 
 factor : NUMERO 
        | ID
