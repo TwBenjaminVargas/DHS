@@ -1,1 +1,1 @@
-int f()
+int ac + 2;
