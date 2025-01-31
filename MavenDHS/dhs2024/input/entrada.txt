@@ -1,12 +1,1 @@
-int i, j, a=0 ? ;
- for(i = 0; ; i = i + 1)
- {
-    j = i;
- }
-
-int f(int a)
-{
-    return a;
-}
-
-a = f(j);
+int f()

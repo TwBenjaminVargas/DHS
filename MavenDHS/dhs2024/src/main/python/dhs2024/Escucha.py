@@ -100,6 +100,7 @@ class Escucha (compiladoresListener):
             
         else:
             self.printError(ctx,"Identificador \"{}\" no definido".format(idstr))
+            self.compatibilityTypeList[-1].append('UNDEF')
             return None
         
     def nombreIdentificadorRepetido(self,id,ctx):
