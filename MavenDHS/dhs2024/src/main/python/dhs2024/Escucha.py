@@ -10,6 +10,7 @@ TAM = 80
 class Escucha (compiladoresListener):
     
     def __init__(self):
+        
         self.numTokens = 0
         self.numNodos = 0
         self.tabla = TablaSimbolos()
@@ -38,8 +39,8 @@ class Escucha (compiladoresListener):
             return True
         return False
     
-    def printError(self, ctx, msj:str):
-        print("- " + f"\033[31mError semantico en linea {ctx.start.line}: {msj}\033[0m")
+    def printError(self, ctx, msj:str, tipo = "semantico"):
+        print("- " + f"\033[31mError {tipo} en linea {ctx.start.line}: {msj}\033[0m")
         self.errorcount += 1
         
     def printAdvertencia(self, ctx, msj:str):
@@ -182,12 +183,42 @@ class Escucha (compiladoresListener):
         print("=" * TAM)
         print("")
         self.printHistoricoContextos()
+        
+        
+    def exitInstruccion(self, ctx:compiladoresParser.InstruccionContext):
+        if ctx.exception:
+            # lanzada cuando falta un punto y coma o falta el id o el tipo
+            self.printError(ctx,"Posible falta de ';' o se utilizo un identificador o tipo invalido","sintactico")
+    
+            
+    def exitT(self, ctx:compiladoresParser.TContext):
+        if ctx.exception:
+            # Obtener el conjunto de tokens esperados en la posición actual
+            expected_tokens = ctx.exception.getExpectedTokens()
+            
+            tokenname = ctx.parser.symbolicNames[expected_tokens.intervals[0].start]
+            if tokenname == 'PYC':
+                self.printError(ctx,"Posible falta de ';'","sintactico")
+            if tokenname == 'PC':
+                self.printError(ctx,"Posible falta de ')'","sintactico")
 
-
+    def exitIif(self, ctx:compiladoresParser.IifContext):
+        if ctx.exception:
+            self.printError(ctx,"Posible falta de condicion, falta de llaves o parentesis","sintactico")
     def enterDeclaracion(self, ctx:compiladoresParser.DeclaracionContext):
         self.inDeclaration = True
    
-        
+    def exitInit(self, ctx:compiladoresParser.InitContext):
+        if ctx.exception:
+                self.printError(ctx,"Posible falta de ';'","sintactico")
+    
+    def exitCondlist(self, ctx:compiladoresParser.CondlistContext):
+        if ctx.exception:
+                self.printError(ctx,"Posible falta de ';'","sintactico")
+    
+    def exitIwhile(self, ctx:compiladoresParser.IwhileContext):
+        if ctx.exception:
+                self.printError(ctx,"Posible cierre erroneo de parentesis")       
     def exitDeclaracion(self, ctx:compiladoresParser.DeclaracionContext):    
         
         # Añadimos la primera ID de la regla
@@ -258,6 +289,8 @@ class Escucha (compiladoresListener):
             
                    
     def exitFactor(self, ctx:compiladoresParser.FactorContext):
+        if ctx.exception:
+            self.printError(ctx,"Operacion incompleta o no reconocible", 1)
         self.añadirTipoAListaControl(ctx)
         id = ctx.getToken(compiladoresParser.ID, 0)
         if id:
@@ -425,3 +458,30 @@ class Escucha (compiladoresListener):
                 tlist.append(tipo)
         tlist.append(t)
         return tlist
+    """
+    TESTER CODE PARA DETECCION DE ERRORES SINTACTICOS
+     
+    def visitErrorNode(self, node):
+        print(f"Error en el nodo: {node.getText()}")
+        
+    def exitEveryRule(self, ctx):
+        #if ctx.exception:
+          #  print(f"Error sintactico {ctx.exception.offendingToken}")
+         if ctx.exception:
+            print(type(ctx))
+            # Obtener el conjunto de tokens esperados en la posición actual
+            expected_tokens = ctx.exception.getExpectedTokens()
+            
+            # Mostrar los tokens esperados
+            print("Tokens esperados en esta posición:")
+            
+            # Iterar a través de los intervalos y mostrar los tokens
+            for interval in expected_tokens.intervals:
+                for tokenindex in range(interval.start, interval.stop):
+                    # Obtener el nombre del token por su tipo (token_type)
+                    #token_name = ctx.parser.symbolicNames[token_type] if token_type < len(ctx.parser.symbolicNames) else f"Unknown({token_type})"
+                    tokenname = ctx.parser.symbolicNames[tokenindex]
+                    print(tokenname)
+                    if tokenname == 'PYC':
+                        print("Error se esperaba ';'")
+            #self.stopsignal = True """

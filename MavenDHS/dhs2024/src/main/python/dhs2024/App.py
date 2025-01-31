@@ -38,7 +38,6 @@ def main(argv):
     parser.removeErrorListeners()
     parser.addErrorListener(error)
     
-    
     tree = parser.programa()
     
     if escucha.isAnyError():
