@@ -11,15 +11,15 @@ Proyecto final de la asignatura “Desarrollo de Herramientas de Software”, el
 - 📦 ANTLR4  
 
 ## 📸 Capturas de pantalla
-*Reporte de Errores*
+*Reporte de Errores:*
 
 ![Reporte Errores](pictures/cap1.png)
 
-*Reporte de contextos*
+*Reporte de contextos:*
 
 ![Contextos](pictures/cap2.png)
 
-*Codigo intermedio*
+*Codigo intermedio:*
 
 ![Codigo intermedio](pictures/cap3.png)
 
