@@ -1,0 +1,20 @@
+label l0
+pop t0
+pop b
+pop a
+t1 = a + b
+push t1
+jmp t0
+
+o = 1
+p = 2
+
+push o
+push p
+push l1
+jmp l0
+label l1
+pop t2
+
+t3 = t2 * 2
+x = t3
