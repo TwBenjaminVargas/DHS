@@ -16,9 +16,11 @@ Proyecto final de la asignatura “Desarrollo de Herramientas de Software”, el
 ![Reporte Errores](pictures/cap1.png)
 
 *Reporte de contextos*
+
 ![Contextos](pictures/cap2.png)
 
 *Codigo intermedio*
+
 ![Codigo intermedio](pictures/cap3.png)
 
 ## ✨ Autores
