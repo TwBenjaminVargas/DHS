@@ -2,6 +2,10 @@ int suma(int a, int b) {
     return a + b;
 }
 
+float multiplicar(int a, int b) {
+    return a * b;
+}
+
 int main() {
     int x = 10, y = 5, resultado1,resultado2;
     float resultadoMul;
@@ -11,20 +15,16 @@ int main() {
 
     resultado1 = suma(x, y);
 
+    resultadoMul = multiplicar(x, y);
+
 
     if (x > 0)
-        x = 1;
+        x=1;
     else
 		x = 2;
 
     int z = 0;
-
-	for(;z < 5;z = z + 1)
-	{
-		x = x + 2;
-	}
-
-	resultado1 = 2;
+    resultadoMul = multiplicar(x, z);
 
     return 0;
 }
