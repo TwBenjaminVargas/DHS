@@ -6,15 +6,47 @@ t1 = a + b
 push t1
 jmp t0
 
-o = 1
-p = 2
-
-push o
-push p
-push l1
-jmp l0
 label l1
 pop t2
+x = 10
+y = 5
+t3 = y * x
+t4 = x + t3
+resultado1 = t4
+t5 = y * x
+t6 = x + t5
+resultado2 = t6
 
-t3 = t2 * 2
-x = t3
+push x
+push y
+push l2
+jmp l0
+label l2
+pop t7
+
+resultado1 = t7
+
+t8 = x > 0
+ifnjmp t8, l3
+x = 1
+jmp l4
+label l3
+x = 2
+label l4
+
+z = 0
+
+label bl5
+t9 = z < 5
+ifnjmp t9, l6
+t10 = x + 2
+x = t10
+t11 = z + 1
+z = t11
+jmp bl5
+label l6
+
+resultado1 = 2
+push 0
+jmp t2
+
