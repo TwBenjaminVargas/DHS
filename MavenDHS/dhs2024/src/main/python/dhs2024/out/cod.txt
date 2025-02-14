@@ -1,52 +1,53 @@
 label l0
 pop t0
-pop b
-pop a
-t1 = a + b
-push t1
+push 1
 jmp t0
 
-label l1
-pop t2
 x = 10
 y = 5
+t1 = y * x
+t2 = x + t1
+r1 = t2
 t3 = y * x
 t4 = x + t3
-resultado1 = t4
-t5 = y * x
-t6 = x + t5
-resultado2 = t6
+r2 = t4
 
-push x
-push y
-push l2
-jmp l0
-label l2
-pop t7
-
-resultado1 = t7
-
-t8 = x > 0
-ifnjmp t8, l3
+t5 = x > 0
+ifnjmp t5, l1
 x = 1
-jmp l4
-label l3
+jmp l2
+label l1
 x = 2
-label l4
+label l2
 
+r1 = x
+
+push l3
+jmp l0
+label l3
+pop t6
+
+r1 = t6
 z = 0
 
-label bl5
-t9 = z < 5
-ifnjmp t9, l6
-t10 = x + 2
-x = t10
-t11 = z + 1
-z = t11
-jmp bl5
-label l6
+label l4
+t7 = z < 5
+ifnjmp t7, l5
+t8 = x + 2
+z = t8
+t9 = x + 2
+y = t9
+t10 = z + 1
+z = t10
+jmp l4
+label l5
 
-resultado1 = 2
-push 0
-jmp t2
-
+t11 = y + x
+r1 = t11
+t12 = y + x
+r2 = t12
+t13 = x + 2
+z = t13
+t14 = 2 - 2
+t15 = 2 / t14
+r1 = t15

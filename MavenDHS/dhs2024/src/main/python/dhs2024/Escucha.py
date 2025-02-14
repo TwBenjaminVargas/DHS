@@ -9,12 +9,11 @@ from TipoDato import TipoDato
 TAM = 80
 class Escucha (compiladoresListener):
     
-    def __init__(self):
+    def __init__(self, table:TablaSimbolos):
         
         self.numTokens = 0
         self.numNodos = 0
-        self.tabla = TablaSimbolos()
-            
+        self.tabla = table
         #pila de control de tipos
         self.compatibilityTypeList = list()
         
@@ -201,6 +200,14 @@ class Escucha (compiladoresListener):
                 self.printError(ctx,"Posible falta de ';'","sintactico")
             if tokenname == 'PC':
                 self.printError(ctx,"Posible falta de ')'","sintactico")
+        #division por cero
+        if ctx.getChildCount() > 0:
+            tkn = ctx.getChild(0).getSymbol()
+            value = ctx.getChild(1).getText()
+            if tkn.type == compiladoresParser.DIV and value == "0":
+                self.printError(ctx, "Intento dividir por cero")
+                
+        
 
     def exitIif(self, ctx:compiladoresParser.IifContext):
         if ctx.exception:
@@ -218,7 +225,7 @@ class Escucha (compiladoresListener):
     
     def exitIwhile(self, ctx:compiladoresParser.IwhileContext):
         if ctx.exception:
-                self.printError(ctx,"Posible cierre erroneo de parentesis")       
+                self.printError(ctx,"Posible cierre erroneo de parentesis","sintactico")       
     def exitDeclaracion(self, ctx:compiladoresParser.DeclaracionContext):    
         
         # Añadimos la primera ID de la regla
@@ -458,6 +465,7 @@ class Escucha (compiladoresListener):
                 tlist.append(tipo)
         tlist.append(t)
         return tlist
+    
     """
     TESTER CODE PARA DETECCION DE ERRORES SINTACTICOS
      

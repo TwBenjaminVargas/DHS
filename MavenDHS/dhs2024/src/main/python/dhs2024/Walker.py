@@ -238,7 +238,7 @@ class Walker (compiladoresVisitor):
         # lista de iniciacion
         if ctx.getChild(2).getChildCount() > 0:
             super().visitInit(ctx.getChild(2))
-        self.codigoIntermedio.addLine(f"label b{self.etiqueta.generateLabel()}")
+        self.codigoIntermedio.addLine(f"label {self.etiqueta.generateLabel()}")
         self.etiquetaList.append(self.etiqueta.getLabel())
         # lista de condicion
         if ctx.getChild(4).getChildCount() > 0:
@@ -253,7 +253,7 @@ class Walker (compiladoresVisitor):
         # lista de iteracion
         if ctx.getChild(6).getChildCount() > 0:
             super().visitIter(ctx.getChild(6))
-        self.codigoIntermedio.addLine(f"jmp b{self.etiquetaList.pop()}")
+        self.codigoIntermedio.addLine(f"jmp {self.etiquetaList.pop()}")
         if ctx.getChild(4).getChildCount() > 0:
             self.codigoIntermedio.addLine(f"label {self.etiquetaList.pop()}")
         self.codigoIntermedio.separateBlock()

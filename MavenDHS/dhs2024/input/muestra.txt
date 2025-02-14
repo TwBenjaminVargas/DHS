@@ -1,30 +1,33 @@
-int suma(int a, int b) {
-    return a + b;
+int a()
+{
+	return 1;
 }
 
-float multiplicar(int a, int b) {
-    return a * b;
+int x = 10, y = 5, r1,r2;
+
+r1 = x + y * x;
+r2 = x + y * x;
+
+if (x > 0)
+    x = 1;
+else
+	x = 2;
+
+r1 = x;
+r1 = a();
+
+int z = 0;
+
+for(;z < 5;z = z + 1)
+{
+	z = x + 2;
+	y = x + 2;
 }
 
-int main() {
-    int x = 10, y = 5, resultado1,resultado2;
-    float resultadoMul;
+r1 = y + x;
 
-	resultado1 = x + y * x;
-	resultado2 = x + y * x;
+r2 = y + x;
 
-    resultado1 = suma(x, y);
+z = x + 2;
+r1 = 2;
 
-    resultadoMul = multiplicar(x, y);
-
-
-    if (x > 0)
-        x=1;
-    else
-		x = 2;
-
-    int z = 0;
-    resultadoMul = multiplicar(x, z);
-
-    return 0;
-}
