@@ -36,4 +36,10 @@ class TablaSimbolos:
                 return contexto.tabla[strid]
         return None
     
+    def buscarGlobalHistoric(self, strid):
+        for contexto in reversed(self.contextosHistoric):
+            if strid in contexto.tabla:
+                return contexto.tabla[strid]
+        return None
+    
         

@@ -1,30 +1,35 @@
-int suma(int a, int b) {
-    return a + b;
+int a()
+{
+	return 1;
 }
 
-int main() {
-    int x = 10, y = 5, resultado1,resultado2;
-    float resultadoMul;
+int x = 10, y = 5, r1,r2;
 
-	resultado1 = x + y * x;
-	resultado2 = x + y * x;
+r1 = x + y * x;
+r2 = x + y * x;
 
-    resultado1 = suma(x, y);
+if (x > 0)
+    x = 1;
+else
+	x = 2;
 
+r1 = x;
+r1 = a();
 
-    if (x > 0)
-        x = 1;
-    else
-		x = 2;
+int z = 0;
 
-    int z = 0;
-
-	for(;z < 5;z = z + 1)
-	{
-		x = x + 2;
-	}
-
-	resultado1 = 2;
-
-    return 0;
+for(;z < 5;z = z + 1)
+{
+	z = x + 2;
+	y = x + 2;
 }
+
+r1 = y + x;
+
+r2 = y + x;
+
+z = x + 2;
+
+
+r1 = 2/(2-2);
+

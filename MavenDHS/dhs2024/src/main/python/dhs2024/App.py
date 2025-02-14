@@ -15,6 +15,9 @@ from Escucha import Escucha # de esta forma se trae especificamente la clase
 from Walker import Walker
 from OptCode import OptCode
 from ErrorEscucha import ErrorEscucha
+from TablaSimbolos import TablaSimbolos
+
+
 
 def main(argv):
     archivo = "input/entrada.txt"
@@ -30,7 +33,9 @@ def main(argv):
     stream = CommonTokenStream(lexer)
     parser = compiladoresParser(stream)
     
-    escucha = Escucha()
+    tabla = TablaSimbolos()
+    
+    escucha = Escucha(tabla)
     parser.addParseListener(escucha)
     
     # Remover el listener de errores por defecto y agregar el personalizado
@@ -39,7 +44,6 @@ def main(argv):
     parser.addErrorListener(error)
     
     tree = parser.programa()
-    
     if escucha.isAnyError():
         sys.exit()
         
@@ -47,8 +51,7 @@ def main(argv):
     caminante = Walker(salida)
     caminante.visitPrograma(tree)
     caminante.finish()
-    
-    optimizador = OptCode()
+    optimizador = OptCode(tabla)
     for i in range(pasadas):
         optimizador.optimizar(salida,optroute)
         salida = optroute
